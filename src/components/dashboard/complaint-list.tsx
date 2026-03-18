@@ -1,0 +1,201 @@
+'use client'
+
+import { useMemo } from 'react'
+import Link from 'next/link'
+import { useSearchParams, useRouter } from 'next/navigation'
+import {
+  Complaint,
+  CATEGORY_ICONS,
+  CATEGORY_LABELS,
+  STATUS_STYLES,
+  SortOption,
+  relativeDate,
+} from './types'
+import { QuickActions } from './quick-actions'
+import { EmptyState } from './empty-state'
+
+interface ComplaintListProps {
+  complaints: Complaint[]
+}
+
+const STATUS_ORDER: Record<string, number> = {
+  draft: 0,
+  generated: 1,
+  reviewed: 2,
+  delivered: 3,
+}
+
+export function ComplaintList({ complaints }: ComplaintListProps) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  const status = searchParams.get('status') || ''
+  const category = searchParams.get('category') || ''
+  const recipientType = searchParams.get('recipientType') || ''
+  const sort = (searchParams.get('sort') as SortOption) || 'newest'
+
+  const filtered = useMemo(() => {
+    let result = complaints
+
+    if (status) {
+      result = result.filter((c) => c.status === status)
+    }
+    if (category) {
+      result = result.filter((c) => c.category === category)
+    }
+    if (recipientType) {
+      result = result.filter((c) => c.recipient_type === recipientType)
+    }
+
+    result = [...result].sort((a, b) => {
+      switch (sort) {
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        case 'status':
+          return (STATUS_ORDER[a.status] ?? 0) - (STATUS_ORDER[b.status] ?? 0)
+        case 'recipient':
+          return a.recipient_name.localeCompare(b.recipient_name)
+        case 'newest':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      }
+    })
+
+    return result
+  }, [complaints, status, category, recipientType, sort])
+
+  const hasActiveFilters = status || category || recipientType
+
+  if (filtered.length === 0 && hasActiveFilters) {
+    return (
+      <EmptyState
+        variant="no-results"
+        onClearFilters={() => router.replace('?', { scroll: false })}
+      />
+    )
+  }
+
+  if (filtered.length === 0) {
+    return <EmptyState variant="no-complaints" />
+  }
+
+  const hasLetter = (c: Complaint) => c.status !== 'draft' && c.generated_letter != null && c.generated_letter.trim().length > 0
+
+  return (
+    <>
+      {/* Desktop: row list */}
+      <div className="hidden md:block rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
+        {filtered.map((complaint) => (
+          <Link
+            key={complaint.id}
+            href={`/dashboard/complaints/${complaint.id}`}
+            className="flex items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+            aria-label={`View complaint to ${complaint.recipient_name}`}
+          >
+            <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-base mr-3 shrink-0" aria-hidden="true">
+              {CATEGORY_ICONS[complaint.category] || '?'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                {complaint.recipient_name}
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-normal ml-1">
+                  · {complaint.recipient_type === 'mp' ? 'MP' : complaint.recipient_type.charAt(0).toUpperCase() + complaint.recipient_type.slice(1)}
+                </span>
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {CATEGORY_LABELS[complaint.category] || complaint.category}
+                {' · '}
+                {relativeDate(complaint.created_at)}
+                {complaint.delivery_method && (
+                  <span className="text-indigo-400 dark:text-indigo-300 ml-1" aria-label={`Delivery method: ${complaint.delivery_method}`}>
+                    · {complaint.delivery_method === 'mailto' ? '✉ mailto' : complaint.delivery_method === 'clipboard' ? '📋 clipboard' : '📧 direct'}
+                  </span>
+                )}
+              </p>
+              {complaint.generated_subject ? (
+                <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5 max-w-md">
+                  {complaint.generated_subject}
+                </p>
+              ) : (
+                <p className="text-xs text-gray-300 dark:text-gray-600 italic mt-0.5">
+                  Letter not yet generated
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2 shrink-0 ml-3">
+              <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[complaint.status] || STATUS_STYLES.draft}`}>
+                {complaint.status}
+              </span>
+              {hasLetter(complaint) && (
+                <QuickActions
+                  compact
+                  subject={complaint.generated_subject || ''}
+                  letter={complaint.generated_letter || ''}
+                  recipientEmail={complaint.recipient_email}
+                />
+              )}
+              <svg className="h-4 w-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Mobile: card list */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {filtered.map((complaint) => (
+          <div
+            key={complaint.id}
+            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4"
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                  {complaint.recipient_name}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {CATEGORY_LABELS[complaint.category] || complaint.category}
+                  {' · '}
+                  {complaint.recipient_type === 'mp' ? 'MP' : complaint.recipient_type.charAt(0).toUpperCase() + complaint.recipient_type.slice(1)}
+                  {' · '}
+                  {relativeDate(complaint.created_at)}
+                </p>
+              </div>
+              <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize shrink-0 ml-2 ${STATUS_STYLES[complaint.status] || STATUS_STYLES.draft}`}>
+                {complaint.status}
+              </span>
+            </div>
+
+            {complaint.generated_subject ? (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
+                {complaint.generated_subject}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-300 dark:text-gray-600 italic mb-3">
+                Letter not yet generated
+              </p>
+            )}
+
+            <div className="flex items-center gap-2">
+              {hasLetter(complaint) && (
+                <QuickActions
+                  subject={complaint.generated_subject || ''}
+                  letter={complaint.generated_letter || ''}
+                  recipientEmail={complaint.recipient_email}
+                />
+              )}
+              <Link
+                href={`/dashboard/complaints/${complaint.id}`}
+                className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-md px-3 py-2 min-h-[44px] hover:bg-gray-50 dark:hover:bg-gray-800 ml-auto"
+                aria-label={`View complaint to ${complaint.recipient_name}`}
+              >
+                View →
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}

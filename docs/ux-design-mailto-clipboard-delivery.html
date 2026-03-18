@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UX Design: Mailto/Clipboard Complaint Delivery — Gap Fixes</title>
+  <style>
+    :root {
+      --blue-600: #2563eb;
+      --blue-700: #1d4ed8;
+      --amber-50: #fffbeb;
+      --amber-200: #fde68a;
+      --amber-600: #d97706;
+      --amber-700: #b45309;
+      --green-50: #f0fdf4;
+      --green-600: #16a34a;
+      --green-700: #15803d;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --red-50: #fef2f2;
+      --red-600: #dc2626;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--gray-900);
+      background: #fff;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.25rem; margin-top: 2.5rem; margin-bottom: 0.75rem; color: var(--gray-800); border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; }
+    h3 { font-size: 1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--gray-700); }
+    p { margin-bottom: 0.75rem; color: var(--gray-600); font-size: 0.9375rem; }
+    .subtitle { color: var(--gray-500); font-size: 0.875rem; margin-bottom: 2rem; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; }
+    .tag-gap { background: var(--amber-50); color: var(--amber-700); border: 1px solid var(--amber-200); }
+    .tag-existing { background: var(--green-50); color: var(--green-700); border: 1px solid #bbf7d0; }
+
+    .wireframe {
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      background: var(--gray-50);
+    }
+    .wireframe-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-400);
+      margin-bottom: 1rem;
+    }
+
+    /* Component mockups */
+    .warning-banner {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      background: var(--amber-50);
+      border: 1px solid var(--amber-200);
+      font-size: 0.8125rem;
+      color: var(--amber-700);
+      margin: 0.75rem 0;
+    }
+    .warning-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      background: var(--amber-600);
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s;
+    }
+    .btn-primary { background: var(--blue-600); color: white; }
+    .btn-primary:hover { background: var(--blue-700); }
+    .btn-outline { background: white; color: var(--gray-700); border: 1px solid var(--gray-300); }
+    .btn-outline:hover { background: var(--gray-50); }
+    .btn-green { background: var(--green-600); color: white; }
+    .btn-disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; }
+
+    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 480px) { .btn-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .card-header {
+      background: var(--gray-50);
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.875rem;
+    }
+    .card-body { padding: 1rem; }
+    .card-footer {
+      background: var(--gray-50);
+      padding: 0.5rem 1rem;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .status-drafted { background: var(--gray-100); color: var(--gray-600); }
+    .status-sent { background: #dbeafe; color: var(--blue-700); }
+
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+    .flow-step {
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      background: var(--gray-100);
+      color: var(--gray-600);
+    }
+    .flow-step.active { background: var(--blue-600); color: white; }
+    .flow-arrow { color: var(--gray-300); font-size: 1.25rem; }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.8125rem;
+    }
+    .spec-table th {
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      background: var(--gray-50);
+      border-bottom: 2px solid var(--gray-200);
+      font-weight: 600;
+      color: var(--gray-600);
+    }
+    .spec-table td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--gray-100);
+      color: var(--gray-700);
+    }
+    .spec-table code {
+      background: var(--gray-100);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.8125rem;
+    }
+
+    .annotation {
+      background: #fefce8;
+      border-left: 3px solid var(--amber-600);
+      padding: 0.5rem 0.75rem;
+      margin: 0.75rem 0;
+      font-size: 0.8125rem;
+      color: var(--amber-700);
+    }
+
+    .section-divider { margin: 3rem 0 0; }
+
+    .success-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #dcfce7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .success-icon svg { color: var(--green-600); }
+  </style>
+</head>
+<body>
+
+<h1>UX Design: Mailto/Clipboard Delivery Gaps</h1>
+<p class="subtitle">Building on the Requirements step — designing the 4 identified gaps in the existing StepDeliver flow.</p>
+
+<!-- ============================================ -->
+<h2>1. Interaction Flow Overview</h2>
+
+<p>The existing 7-step wizard already handles most of the delivery flow. This design focuses on the <strong>4 gaps</strong> identified in the Requirements step. The flow below highlights where changes occur:</p>
+
+<div class="flow-diagram">
+  <span class="flow-step">Step 1–4: Input</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Step 5: Review &amp; Generate</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step active">Step 6: Deliver (Gaps 1, 4)</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step active">Step 7: Success (Gap 3)</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step active">History (Gap 3)</span>
+</div>
+
+<!-- ============================================ -->
+<h2>2. Gap 1: Long Complaint Mailto Warning</h2>
+
+<p><span class="tag tag-gap">New Component</span> When the URL-encoded complaint body exceeds 1500 characters, a warning banner appears above the delivery buttons.</p>
+
+<h3>Wireframe — Warning visible</h3>
+<div class="wireframe">
+  <div class="wireframe-label">Step 6: Deliver — long complaint detected</div>
+
+  <div style="margin-bottom:1rem;">
+    <p style="font-size:0.8125rem;color:var(--gray-500);margin-bottom:0.25rem;font-weight:500;">Deliver your complaint</p>
+  </div>
+
+  <!-- Recipient email (existing) -->
+  <div style="margin-bottom:0.75rem;">
+    <label style="font-size:0.75rem;font-weight:500;color:var(--gray-500);">Recipient email</label>
+    <div style="border:1px solid var(--gray-300);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.875rem;margin-top:0.25rem;color:var(--gray-700);">complaints@example.co.uk</div>
+  </div>
+
+  <!-- NEW: Warning banner -->
+  <div class="warning-banner">
+    <div class="warning-icon">!</div>
+    <div>
+      <strong>Long complaint detected.</strong> Your letter may be truncated when opened in some email clients. We recommend copying to clipboard and pasting into your email instead.
+    </div>
+  </div>
+
+  <!-- Delivery buttons -->
+  <div class="btn-grid" style="margin-top:0.75rem;">
+    <button class="btn btn-primary">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Copy to clipboard
+    </button>
+    <button class="btn btn-outline" style="position:relative;">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      Open in email client
+      <span style="position:absolute;top:-6px;right:-6px;background:var(--amber-600);color:white;font-size:0.625rem;padding:1px 5px;border-radius:999px;font-weight:600;">!</span>
+    </button>
+  </div>
+</div>
+
+<h3>Behaviour Specification</h3>
+<table class="spec-table">
+  <tr><th>Property</th><th>Value</th></tr>
+  <tr><td>Trigger</td><td><code>encodeURIComponent(generatedLetter).length &gt; 1500</code></td></tr>
+  <tr><td>Position</td><td>Between recipient email input and delivery buttons</td></tr>
+  <tr><td>Icon</td><td>Amber circle with "!" — matches existing warning patterns</td></tr>
+  <tr><td>Mailto button</td><td>Remains enabled (not blocked), but shows amber "!" badge on the button</td></tr>
+  <tr><td>Clipboard button</td><td>Visually promoted — stays primary blue (already is)</td></tr>
+  <tr><td>Re-evaluation</td><td>Recalculate on every letter edit save (user may shorten the letter)</td></tr>
+  <tr><td>Accessibility</td><td><code>role="alert"</code> on warning banner for screen reader announcement</td></tr>
+</table>
+
+<div class="annotation">
+  <strong>Design decision:</strong> We don't disable the mailto button because some clients handle long URLs fine. The warning informs without blocking.
+</div>
+
+<!-- ============================================ -->
+<h2>3. Gap 3: "Mark as Sent" on Success Page</h2>
+
+<p><span class="tag tag-gap">New Component</span> After delivery via clipboard or mailto, the success page (Step 7) offers a "Mark as sent" button so users can self-report that they actually sent the email.</p>
+
+<h3>Wireframe — Success page with "Mark as sent"</h3>
+<div class="wireframe">
+  <div class="wireframe-label">Step 7: Success — after clipboard/mailto delivery</div>
+
+  <div style="text-align:center;padding:1rem 0;">
+    <div class="success-icon" style="margin:0 auto 1rem;">
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:#16a34a"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h3 style="font-size:1.125rem;margin-bottom:0.25rem;">Complaint ready to send</h3>
+    <p style="font-size:0.875rem;color:var(--gray-500);margin-bottom:0.25rem;">
+      To: <strong>British Gas</strong> &middot; Ref: AC-3b0c
+    </p>
+    <div style="margin:0.75rem 0;">
+      <span class="status-badge status-drafted">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--gray-400);display:inline-block;"></span>
+        Drafted
+      </span>
+    </div>
+  </div>
+
+  <!-- NEW: Mark as sent prompt -->
+  <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:1rem;text-align:center;margin:1rem 0;">
+    <p style="font-size:0.8125rem;color:var(--gray-600);margin-bottom:0.75rem;">
+      Did you send this complaint from your email?
+    </p>
+    <button class="btn btn-primary btn-sm" style="margin-right:0.5rem;">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      Yes, I sent it
+    </button>
+    <button class="btn btn-outline btn-sm">Not yet</button>
+  </div>
+
+  <!-- Existing action buttons -->
+  <div class="btn-grid" style="margin-top:1rem;">
+    <button class="btn btn-outline" style="width:100%;">View complaint history</button>
+    <button class="btn btn-outline" style="width:100%;">Start new complaint</button>
+  </div>
+</div>
+
+<h3>Wireframe — After clicking "Yes, I sent it"</h3>
+<div class="wireframe">
+  <div class="wireframe-label">Step 7: Success — confirmed sent</div>
+
+  <div style="text-align:center;padding:1rem 0;">
+    <div class="success-icon" style="margin:0 auto 1rem;">
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:#16a34a"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h3 style="font-size:1.125rem;margin-bottom:0.25rem;">Complaint sent!</h3>
+    <p style="font-size:0.875rem;color:var(--gray-500);margin-bottom:0.25rem;">
+      To: <strong>British Gas</strong> &middot; Ref: AC-3b0c
+    </p>
+    <div style="margin:0.75rem 0;">
+      <span class="status-badge status-sent">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--blue-600);display:inline-block;"></span>
+        Sent
+      </span>
+    </div>
+  </div>
+
+  <div class="btn-grid" style="margin-top:1rem;">
+    <button class="btn btn-outline" style="width:100%;">View complaint history</button>
+    <button class="btn btn-outline" style="width:100%;">Start new complaint</button>
+  </div>
+</div>
+
+<h3>Behaviour Specification</h3>
+<table class="spec-table">
+  <tr><th>Property</th><th>Value</th></tr>
+  <tr><td>Initial state</td><td>Status badge shows "Drafted", prompt asks "Did you send this?"</td></tr>
+  <tr><td>"Yes, I sent it"</td><td>PATCH <code>/api/complaints/[id]</code> with <code>status: "sent"</code>. Badge updates to "Sent". Prompt hides.</td></tr>
+  <tr><td>"Not yet"</td><td>Hides the prompt. User can mark as sent later from history dashboard.</td></tr>
+  <tr><td>API change</td><td>Add "sent" to valid status values in complaints table and PATCH endpoint</td></tr>
+  <tr><td>Optimistic update</td><td>Badge updates immediately; API call is non-blocking (same pattern as edit saves)</td></tr>
+  <tr><td>Error handling</td><td>If PATCH fails, show subtle toast "Couldn't update status" — don't revert badge</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>4. Gap 4: Recipient Email Validation in Wizard</h2>
+
+<p><span class="tag tag-gap">Enhancement</span> Ensure recipient email is always available by Step 6.</p>
+
+<h3>Current State</h3>
+<p>Step 1 collects recipient type and name. Recipient email is only entered at Step 6 (StepDeliver). This works but means users must type the email at the last moment.</p>
+
+<h3>Proposed Change</h3>
+<p>Add an <strong>optional</strong> email field to Step 1 (StepRecipient) that pre-populates Step 6. Keep the email field editable on Step 6 as a fallback.</p>
+
+<div class="wireframe">
+  <div class="wireframe-label">Step 1: Recipient — with optional email field</div>
+
+  <div style="margin-bottom:1rem;">
+    <label style="font-size:0.75rem;font-weight:500;color:var(--gray-500);">Who is your complaint about?</label>
+    <div style="border:1px solid var(--blue-600);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.875rem;margin-top:0.25rem;background:#eff6ff;">Company</div>
+  </div>
+  <div style="margin-bottom:1rem;">
+    <label style="font-size:0.75rem;font-weight:500;color:var(--gray-500);">Company name</label>
+    <div style="border:1px solid var(--gray-300);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.875rem;margin-top:0.25rem;">British Gas</div>
+  </div>
+  <div style="margin-bottom:0.5rem;">
+    <label style="font-size:0.75rem;font-weight:500;color:var(--gray-500);">Complaint email address <span style="font-weight:400;color:var(--gray-400);">(optional — you can add this later)</span></label>
+    <div style="border:1px solid var(--gray-300);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.875rem;margin-top:0.25rem;color:var(--gray-400);">e.g. complaints@britishgas.co.uk</div>
+  </div>
+</div>
+
+<table class="spec-table">
+  <tr><th>Property</th><th>Value</th></tr>
+  <tr><td>Field</td><td>Optional email input on Step 1</td></tr>
+  <tr><td>Pre-population</td><td>For MP recipients, auto-fill from MP lookup data if available</td></tr>
+  <tr><td>Validation</td><td>Basic email format check (same regex as Step 6)</td></tr>
+  <tr><td>Step 6 behaviour</td><td>If email already set from Step 1, show pre-filled. Always editable.</td></tr>
+  <tr><td>Not required</td><td>User can skip and enter at Step 6 — no blocking validation</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>5. Gap 2: Status Tracking</h2>
+
+<p><span class="tag tag-gap">Backend Change</span> This is primarily a data model change, not a UX change. The design implications are the status badges shown above.</p>
+
+<h3>Complaint Status Flow</h3>
+<div class="flow-diagram">
+  <span class="flow-step">draft</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">generated</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">reviewed</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step active">delivered</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step active">sent</span>
+</div>
+
+<table class="spec-table">
+  <tr><th>Status</th><th>Meaning</th><th>Badge Colour</th></tr>
+  <tr><td><code>draft</code></td><td>User started wizard, complaint saved</td><td>Gray</td></tr>
+  <tr><td><code>generated</code></td><td>AI generated the letter</td><td>Gray</td></tr>
+  <tr><td><code>reviewed</code></td><td>User edited/reviewed the letter</td><td>Gray</td></tr>
+  <tr><td><code>delivered</code></td><td>User copied/opened mailto (existing)</td><td>Amber — "Ready to send"</td></tr>
+  <tr><td><code>sent</code></td><td>User confirmed they sent it (new)</td><td>Blue — "Sent"</td></tr>
+</table>
+
+<div class="annotation">
+  <strong>Note:</strong> The "delivered" status is set automatically when user clicks clipboard/mailto. The "sent" status is user-confirmed only.
+</div>
+
+<!-- ============================================ -->
+<h2>6. Accessibility Checklist</h2>
+
+<table class="spec-table">
+  <tr><th>Item</th><th>Requirement</th></tr>
+  <tr><td>Warning banner</td><td><code>role="alert"</code> for screen reader announcement. Amber text on amber-50 bg passes WCAG AA (4.64:1 contrast).</td></tr>
+  <tr><td>"Mark as sent" buttons</td><td>Keyboard-accessible. Focus trap not needed (inline prompt, not modal).</td></tr>
+  <tr><td>Status badges</td><td>Include text label (not colour-only). Dot indicator is decorative (<code>aria-hidden</code>).</td></tr>
+  <tr><td>Mailto warning badge</td><td>"!" on mailto button has <code>aria-label="Warning: letter may be truncated"</code>.</td></tr>
+  <tr><td>Email input</td><td>Existing <code>htmlFor</code>/<code>id</code> association preserved on Step 1 addition.</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>7. Mobile Considerations</h2>
+
+<ul style="font-size:0.875rem;color:var(--gray-600);padding-left:1.25rem;line-height:1.8;">
+  <li>Warning banner: Full-width, text wraps naturally. Icon stays top-aligned.</li>
+  <li>Delivery buttons: Stack vertically on &lt;480px (existing <code>grid-cols-1</code> breakpoint).</li>
+  <li>"Mark as sent" prompt: Buttons stack vertically on small screens.</li>
+  <li>Mailto link: Opens native mail app on mobile — more reliable than desktop. Warning is still shown for consistency.</li>
+</ul>
+
+<!-- ============================================ -->
+<h2>8. States Summary</h2>
+
+<table class="spec-table">
+  <tr><th>Component</th><th>States</th></tr>
+  <tr><td>Warning banner</td><td><strong>Hidden</strong> (short letter) / <strong>Visible</strong> (long letter) / <strong>Re-hidden</strong> (user edits letter shorter)</td></tr>
+  <tr><td>"Mark as sent" prompt</td><td><strong>Visible</strong> (initial) / <strong>Loading</strong> (API call) / <strong>Hidden + badge updated</strong> (confirmed) / <strong>Hidden</strong> (dismissed with "Not yet")</td></tr>
+  <tr><td>Status badge</td><td><strong>Drafted</strong> (gray) / <strong>Sent</strong> (blue)</td></tr>
+  <tr><td>Email field (Step 1)</td><td><strong>Empty</strong> / <strong>Valid email</strong> / <strong>Invalid format</strong> (red border + hint) / <strong>Auto-populated</strong> (MP lookup)</td></tr>
+</table>
+
+</body>
+</html>

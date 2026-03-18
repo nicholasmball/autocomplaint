@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UX Design: Complaint Submission Workflow</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #171717; line-height: 1.5; }
+
+    /* Layout */
+    .doc-header { background: #1e293b; color: white; padding: 2rem; }
+    .doc-header h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .doc-header p { color: #94a3b8; font-size: 0.875rem; }
+    .doc-nav { background: white; border-bottom: 1px solid #e5e7eb; padding: 0.75rem 2rem; position: sticky; top: 0; z-index: 10; display: flex; gap: 1.5rem; overflow-x: auto; }
+    .doc-nav a { font-size: 0.8125rem; color: #6b7280; text-decoration: none; white-space: nowrap; }
+    .doc-nav a:hover { color: #2563eb; }
+    .content { max-width: 960px; margin: 0 auto; padding: 2rem; }
+
+    /* Section */
+    .section { background: white; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 2rem; overflow: hidden; }
+    .section-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb; }
+    .section-header h2 { font-size: 1.125rem; margin-bottom: 0.25rem; }
+    .section-header p { font-size: 0.8125rem; color: #6b7280; }
+    .section-body { padding: 1.5rem; }
+
+    /* Flow diagram */
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 1rem 0; }
+    .flow-step { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 500; color: #1e40af; }
+    .flow-step.new { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+    .flow-step.existing { background: #f5f3ff; border-color: #ddd6fe; color: #5b21b6; }
+    .flow-arrow { color: #9ca3af; font-size: 1.25rem; }
+    .flow-legend { display: flex; gap: 1.5rem; font-size: 0.75rem; color: #6b7280; margin-top: 0.75rem; }
+    .flow-legend span { display: flex; align-items: center; gap: 0.375rem; }
+    .flow-legend .dot { width: 10px; height: 10px; border-radius: 3px; }
+    .dot-existing { background: #f5f3ff; border: 1px solid #ddd6fe; }
+    .dot-new { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .dot-modified { background: #eff6ff; border: 1px solid #bfdbfe; }
+
+    /* Wireframes */
+    .wireframe { border: 2px solid #e5e7eb; border-radius: 8px; background: #fafafa; overflow: hidden; margin: 1rem 0; }
+    .wireframe-label { background: #f3f4f6; padding: 0.5rem 1rem; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
+    .wireframe-body { padding: 1.5rem; }
+
+    /* Mock components */
+    .mock-nav { background: white; border-bottom: 1px solid #e5e7eb; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.8125rem; }
+    .mock-nav strong { font-size: 1rem; }
+    .mock-nav-links { display: flex; gap: 1rem; color: #6b7280; font-size: 0.75rem; }
+    .mock-btn { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; border: none; cursor: pointer; }
+    .mock-btn-primary { background: #2563eb; color: white; }
+    .mock-btn-secondary { background: white; border: 1px solid #d1d5db; color: #374151; }
+    .mock-btn-success { background: #16a34a; color: white; }
+    .mock-btn-ghost { background: transparent; color: #6b7280; padding: 0.375rem 0.75rem; }
+    .mock-card { border: 1px solid #e5e7eb; border-radius: 8px; background: white; overflow: hidden; }
+    .mock-input { border: 1px solid #d1d5db; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.8125rem; width: 100%; background: white; }
+    .mock-badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.6875rem; font-weight: 500; }
+    .badge-draft { background: #f3f4f6; color: #6b7280; }
+    .badge-generated { background: #dbeafe; color: #1e40af; }
+    .badge-delivered { background: #dcfce7; color: #166534; }
+    .badge-reviewed { background: #fef3c7; color: #92400e; }
+
+    /* State annotations */
+    .state-note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 0.75rem 1rem; font-size: 0.75rem; color: #92400e; margin: 0.75rem 0; }
+    .state-note strong { display: block; margin-bottom: 0.25rem; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+    th { text-align: left; padding: 0.625rem 0.75rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151; }
+    td { padding: 0.625rem 0.75rem; border-bottom: 1px solid #f3f4f6; color: #4b5563; }
+
+    /* Success confirmation */
+    .success-overlay { background: #f0fdf4; border: 2px solid #86efac; border-radius: 12px; padding: 2rem; text-align: center; }
+    .success-overlay .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .success-overlay h3 { font-size: 1.125rem; margin-bottom: 0.375rem; }
+    .success-overlay p { font-size: 0.8125rem; color: #6b7280; }
+
+    /* Timeline */
+    .timeline { display: flex; align-items: center; gap: 0; margin: 1rem 0; }
+    .timeline-step { flex: 1; text-align: center; position: relative; }
+    .timeline-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #d1d5db; background: white; margin: 0 auto 0.375rem; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; font-weight: 700; color: #9ca3af; position: relative; z-index: 1; }
+    .timeline-dot.active { background: #2563eb; border-color: #2563eb; color: white; }
+    .timeline-dot.done { background: #16a34a; border-color: #16a34a; color: white; }
+    .timeline-label { font-size: 0.6875rem; color: #6b7280; }
+    .timeline-step:not(:last-child)::after { content: ''; position: absolute; top: 12px; left: 50%; width: 100%; height: 2px; background: #e5e7eb; z-index: 0; }
+    .timeline-step.done:not(:last-child)::after { background: #16a34a; }
+
+    /* Responsive note */
+    .responsive-note { display: flex; gap: 1rem; margin: 1rem 0; }
+    .responsive-note .device { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; text-align: center; }
+    .responsive-note .device-label { font-size: 0.6875rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 0.25rem; }
+    .responsive-note .device-desc { font-size: 0.75rem; color: #4b5563; }
+
+    /* A11y checklist */
+    .a11y-list { list-style: none; padding: 0; }
+    .a11y-list li { padding: 0.375rem 0; font-size: 0.8125rem; color: #374151; display: flex; align-items: flex-start; gap: 0.5rem; }
+    .a11y-list li::before { content: '\2713'; color: #16a34a; font-weight: bold; flex-shrink: 0; }
+
+    /* Complaint list row */
+    .complaint-row { display: flex; align-items: center; padding: 0.875rem 1rem; border-bottom: 1px solid #f3f4f6; cursor: pointer; }
+    .complaint-row:hover { background: #f9fafb; }
+    .complaint-row:last-child { border-bottom: none; }
+    .complaint-icon { width: 36px; height: 36px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-right: 0.75rem; flex-shrink: 0; }
+    .complaint-info { flex: 1; min-width: 0; }
+    .complaint-info .name { font-size: 0.875rem; font-weight: 500; color: #111827; }
+    .complaint-info .meta { font-size: 0.75rem; color: #9ca3af; }
+    .complaint-end { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+    .complaint-chevron { color: #d1d5db; font-size: 0.875rem; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 3rem 2rem; }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+    .empty-state h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.375rem; }
+    .empty-state p { font-size: 0.8125rem; color: #9ca3af; margin-bottom: 1.5rem; }
+
+    h3 { font-size: 0.9375rem; margin-bottom: 0.5rem; }
+    .mb-1 { margin-bottom: 1rem; }
+    .mb-2 { margin-bottom: 1.5rem; }
+    .mt-1 { margin-top: 1rem; }
+    .text-muted { color: #6b7280; font-size: 0.8125rem; }
+  </style>
+</head>
+<body>
+
+<div class="doc-header">
+  <h1>Complaint Submission Workflow &mdash; UX Design</h1>
+  <p>Building on the Requirements step. Wireframes and interaction flows for R1&ndash;R6.</p>
+</div>
+
+<nav class="doc-nav">
+  <a href="#flow">User Flow</a>
+  <a href="#deliver">Deliver Step Changes</a>
+  <a href="#success">Success Confirmation</a>
+  <a href="#dashboard">Dashboard</a>
+  <a href="#detail">Complaint Detail</a>
+  <a href="#states">All States</a>
+  <a href="#responsive">Responsive</a>
+  <a href="#a11y">Accessibility</a>
+</nav>
+
+<div class="content">
+
+  <!-- ============ USER FLOW ============ -->
+  <div class="section" id="flow">
+    <div class="section-header">
+      <h2>End-to-End User Flow</h2>
+      <p>Building on the Requirements document, this maps the complete interaction from wizard to history.</p>
+    </div>
+    <div class="section-body">
+      <div class="flow">
+        <div class="flow-step existing">Step 1: Recipient</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step existing">Step 2: Category</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step existing">Step 3: Details</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step existing">Step 4: Outcome</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step">Step 5: Review</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step">Step 6: Deliver</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step new">Success</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step new">Dashboard</div>
+      </div>
+      <div class="flow-legend">
+        <span><span class="dot dot-existing"></span> Existing (no changes)</span>
+        <span><span class="dot dot-modified"></span> Modified</span>
+        <span><span class="dot dot-new"></span> New screen</span>
+      </div>
+
+      <h3 class="mt-1">Data persistence points</h3>
+      <table>
+        <thead>
+          <tr><th>Trigger</th><th>Action</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>User clicks "Generate Complaint" (Step 5)</td><td>POST /api/complaints &mdash; save draft to DB</td><td>draft</td></tr>
+          <tr><td>AI generation completes</td><td>PATCH /api/complaints/[id] &mdash; store letter + subject</td><td>generated</td></tr>
+          <tr><td>User edits letter and saves (Step 6)</td><td>PATCH /api/complaints/[id] &mdash; update letter text</td><td>reviewed</td></tr>
+          <tr><td>User copies or opens mailto (Step 6)</td><td>PATCH /api/complaints/[id] &mdash; set delivery_method</td><td>delivered</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ DELIVER STEP CHANGES ============ -->
+  <div class="section" id="deliver">
+    <div class="section-header">
+      <h2>Step 6: Deliver &mdash; Updated Design</h2>
+      <p>Extends the existing deliver step with persistence integration and success transition. The current layout and visual style are preserved.</p>
+    </div>
+    <div class="section-body">
+      <p class="text-muted mb-1">Changes from existing implementation are minimal &mdash; we keep the current letter preview, edit mode, copy/mailto buttons, and secondary actions. The following are <strong>additions only:</strong></p>
+
+      <div class="wireframe">
+        <div class="wireframe-label">Step 6: Deliver (updated)</div>
+        <div class="wireframe-body">
+          <div style="font-size: 1.0625rem; font-weight: 600; margin-bottom: 0.25rem;">Your complaint is ready</div>
+          <div style="font-size: 0.8125rem; color: #6b7280; margin-bottom: 1rem;">Review your letter below, then copy it or open it in your email client.</div>
+
+          <!-- Letter preview (existing - abbreviated) -->
+          <div class="mock-card mb-1">
+            <div style="background: #f9fafb; padding: 0.625rem 1rem; border-bottom: 1px solid #e5e7eb;">
+              <span style="font-size: 0.8125rem; color: #6b7280;">Subject: </span>
+              <span style="font-size: 0.8125rem; font-weight: 500;">Formal Complaint Regarding Billing Error</span>
+            </div>
+            <div style="padding: 1rem; font-family: Georgia, serif; font-size: 0.8125rem; color: #4b5563; line-height: 1.7;">
+              Dear Sir/Madam,<br><br>
+              I am writing to formally complain about...<br><br>
+              <span style="color: #9ca3af;">[Letter body shown here &mdash; existing component, no changes]</span>
+            </div>
+            <div style="background: #f9fafb; padding: 0.5rem 1rem; border-top: 1px solid #e5e7eb;">
+              <span style="font-size: 0.75rem; color: #2563eb; cursor: pointer;">Edit letter</span>
+            </div>
+          </div>
+
+          <!-- Delivery section -->
+          <div style="margin-bottom: 1rem;">
+            <div style="font-size: 0.8125rem; font-weight: 500; margin-bottom: 0.5rem;">Deliver your complaint</div>
+            <div style="margin-bottom: 0.5rem;">
+              <div style="font-size: 0.6875rem; font-weight: 500; color: #6b7280; margin-bottom: 0.25rem;">Recipient email</div>
+              <input class="mock-input" value="complaints@vodafone.co.uk" readonly style="font-size: 0.8125rem;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <button class="mock-btn mock-btn-primary" style="justify-content: center; width: 100%;">&#128203; Copy to clipboard</button>
+              <button class="mock-btn mock-btn-secondary" style="justify-content: center; width: 100%;">&#9993; Open in email client</button>
+            </div>
+          </div>
+
+          <!-- NEW: Saving indicator -->
+          <div class="state-note">
+            <strong>New: Auto-save indicator</strong>
+            When the user edits the letter and clicks "Save changes", a subtle "Saved" indicator appears briefly (same pattern as the existing localStorage draft-save indicator in the wizard). The complaint record is PATCH'd in the background.
+          </div>
+
+          <!-- Secondary actions (existing) -->
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 0.75rem; display: flex; gap: 1rem;">
+            <span style="font-size: 0.8125rem; color: #6b7280; cursor: pointer;">Regenerate</span>
+            <span style="font-size: 0.8125rem; color: #6b7280; cursor: pointer;">New complaint</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Interaction changes</h3>
+      <table>
+        <thead><tr><th>Action</th><th>Current behaviour</th><th>New behaviour</th></tr></thead>
+        <tbody>
+          <tr><td>Click "Copy to clipboard"</td><td>Copies text, shows "Copied!" for 3s</td><td>Same + PATCH status to "delivered" (delivery_method: clipboard) + transition to Success overlay after 1.5s</td></tr>
+          <tr><td>Click "Open in email client"</td><td>Opens mailto: link</td><td>Same + PATCH status to "delivered" (delivery_method: mailto) + show Success overlay on return focus</td></tr>
+          <tr><td>Save edits</td><td>Updates wizard context + localStorage</td><td>Same + PATCH complaint record with edited letter text</td></tr>
+          <tr><td>Regenerate</td><td>Calls generate API</td><td>Same + PATCH complaint with new generated text</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ SUCCESS CONFIRMATION ============ -->
+  <div class="section" id="success">
+    <div class="section-header">
+      <h2>Success Confirmation</h2>
+      <p>New screen shown after delivery. Replaces the deliver step content (same wizard container).</p>
+    </div>
+    <div class="section-body">
+      <div class="wireframe">
+        <div class="wireframe-label">Success state (replaces Step 6 content)</div>
+        <div class="wireframe-body">
+          <div class="success-overlay">
+            <div class="icon">&#10004;</div>
+            <h3>Complaint delivered</h3>
+            <p style="margin-bottom: 1rem;">Your complaint to <strong>Vodafone</strong> has been copied to your clipboard.<br>Ref: <strong>AC-2F8A</strong></p>
+            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+              <button class="mock-btn mock-btn-primary">View in complaint history</button>
+              <button class="mock-btn mock-btn-secondary">Start new complaint</button>
+            </div>
+            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #bbf7d0;">
+              <p style="font-size: 0.75rem; color: #6b7280;">You can still <a href="#" style="color: #2563eb; text-decoration: none;">copy the letter again</a> or <a href="#" style="color: #2563eb; text-decoration: none;">re-open in your email client</a>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="state-note">
+        <strong>Complaint reference</strong>
+        The ref code (e.g. "AC-2F8A") is derived from the first 4 hex characters of the complaint UUID. This is for the user's own reference only &mdash; not used for any system lookup. It gives the user something tangible to remember.
+      </div>
+
+      <h3>Behaviour</h3>
+      <ul style="font-size: 0.8125rem; color: #4b5563; padding-left: 1.25rem; line-height: 2;">
+        <li>localStorage draft is cleared on successful delivery</li>
+        <li>"View in complaint history" navigates to /dashboard (scrolls to the new complaint)</li>
+        <li>"Start new complaint" calls wizard reset() and returns to Step 1</li>
+        <li>Copy/mailto links at the bottom repeat the delivery action without changing status</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <div class="section" id="dashboard">
+    <div class="section-header">
+      <h2>Dashboard: Complaint History</h2>
+      <p>Replaces the current placeholder. Extends R5 from the Requirements step.</p>
+    </div>
+    <div class="section-body">
+
+      <!-- Populated state -->
+      <div class="wireframe">
+        <div class="wireframe-label">Dashboard &mdash; populated state</div>
+        <div class="wireframe-body" style="padding: 0;">
+          <div class="mock-nav">
+            <strong>AutoComplaint</strong>
+            <div class="mock-nav-links">
+              <span>Profile</span>
+              <span>nick@email.com</span>
+              <span>Sign out</span>
+            </div>
+          </div>
+          <div style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <div>
+                <div style="font-size: 1.25rem; font-weight: 700;">Welcome, Nick</div>
+              </div>
+              <button class="mock-btn mock-btn-primary">+ New Complaint</button>
+            </div>
+
+            <div style="font-size: 0.8125rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem;">Your complaints</div>
+
+            <div class="mock-card">
+              <div class="complaint-row">
+                <div class="complaint-icon">&#128176;</div>
+                <div class="complaint-info">
+                  <div class="name">Vodafone</div>
+                  <div class="meta">Billing &middot; 17 Mar 2026</div>
+                </div>
+                <div class="complaint-end">
+                  <span class="mock-badge badge-delivered">Delivered</span>
+                  <span class="complaint-chevron">&rsaquo;</span>
+                </div>
+              </div>
+              <div class="complaint-row">
+                <div class="complaint-icon">&#128230;</div>
+                <div class="complaint-info">
+                  <div class="name">Amazon</div>
+                  <div class="meta">Delivery &middot; 15 Mar 2026</div>
+                </div>
+                <div class="complaint-end">
+                  <span class="mock-badge badge-generated">Generated</span>
+                  <span class="complaint-chevron">&rsaquo;</span>
+                </div>
+              </div>
+              <div class="complaint-row">
+                <div class="complaint-icon">&#128100;</div>
+                <div class="complaint-info">
+                  <div class="name">Sarah Jones MP</div>
+                  <div class="meta">Poor Service &middot; 12 Mar 2026</div>
+                </div>
+                <div class="complaint-end">
+                  <span class="mock-badge badge-delivered">Delivered</span>
+                  <span class="complaint-chevron">&rsaquo;</span>
+                </div>
+              </div>
+              <div class="complaint-row">
+                <div class="complaint-icon">&#128176;</div>
+                <div class="complaint-info">
+                  <div class="name">British Gas</div>
+                  <div class="meta">Contract Dispute &middot; 8 Mar 2026</div>
+                </div>
+                <div class="complaint-end">
+                  <span class="mock-badge badge-draft">Draft</span>
+                  <span class="complaint-chevron">&rsaquo;</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="wireframe">
+        <div class="wireframe-label">Dashboard &mdash; empty state</div>
+        <div class="wireframe-body" style="padding: 0;">
+          <div class="mock-nav">
+            <strong>AutoComplaint</strong>
+            <div class="mock-nav-links">
+              <span>Profile</span>
+              <span>nick@email.com</span>
+              <span>Sign out</span>
+            </div>
+          </div>
+          <div style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <div style="font-size: 1.25rem; font-weight: 700;">Welcome, Nick</div>
+              <button class="mock-btn mock-btn-primary">+ New Complaint</button>
+            </div>
+            <div class="mock-card">
+              <div class="empty-state">
+                <div class="icon">&#9993;</div>
+                <h3>No complaints yet</h3>
+                <p>When you generate and deliver complaints, they'll appear here so you can track them.</p>
+                <button class="mock-btn mock-btn-primary">Start your first complaint</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="mt-1">Design decisions</h3>
+      <ul style="font-size: 0.8125rem; color: #4b5563; padding-left: 1.25rem; line-height: 2;">
+        <li><strong>Category icons:</strong> Each category maps to a simple unicode icon in a tinted circle. Keeps it lightweight without an icon library.</li>
+        <li><strong>Status badges:</strong> Draft (grey), Generated (blue), Reviewed (amber), Delivered (green) &mdash; colour-coded for quick scanning.</li>
+        <li><strong>Click target:</strong> Entire row is clickable, navigates to /dashboard/complaints/[id].</li>
+        <li><strong>No pagination needed for MVP:</strong> Users won't have hundreds of complaints initially. If needed later, add "Load more" button.</li>
+        <li><strong>Server component:</strong> Dashboard fetches complaints server-side for fast initial render.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ COMPLAINT DETAIL ============ -->
+  <div class="section" id="detail">
+    <div class="section-header">
+      <h2>Complaint Detail View</h2>
+      <p>New page at /dashboard/complaints/[id]. Implements R6 from Requirements.</p>
+    </div>
+    <div class="section-body">
+      <div class="wireframe">
+        <div class="wireframe-label">Complaint Detail &mdash; delivered complaint</div>
+        <div class="wireframe-body" style="padding: 0;">
+          <div class="mock-nav">
+            <strong>AutoComplaint</strong>
+            <div class="mock-nav-links">
+              <span>Profile</span>
+              <span>nick@email.com</span>
+              <span>Sign out</span>
+            </div>
+          </div>
+          <div style="padding: 1.5rem;">
+            <!-- Back link -->
+            <div style="margin-bottom: 1rem;">
+              <a href="#" style="font-size: 0.8125rem; color: #2563eb; text-decoration: none;">&larr; Back to dashboard</a>
+            </div>
+
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+              <div>
+                <div style="font-size: 1.125rem; font-weight: 700;">Complaint to Vodafone</div>
+                <div style="font-size: 0.8125rem; color: #6b7280;">Billing &middot; Formal tone &middot; Ref: AC-2F8A</div>
+              </div>
+              <span class="mock-badge badge-delivered" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">Delivered via clipboard</span>
+            </div>
+
+            <!-- Status timeline -->
+            <div class="mock-card mb-2">
+              <div style="padding: 1rem 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 0.75rem;">Status</div>
+                <div class="timeline">
+                  <div class="timeline-step done">
+                    <div class="timeline-dot done">&#10003;</div>
+                    <div class="timeline-label">Draft</div>
+                  </div>
+                  <div class="timeline-step done">
+                    <div class="timeline-dot done">&#10003;</div>
+                    <div class="timeline-label">Generated</div>
+                  </div>
+                  <div class="timeline-step done">
+                    <div class="timeline-dot done">&#10003;</div>
+                    <div class="timeline-label">Reviewed</div>
+                  </div>
+                  <div class="timeline-step done">
+                    <div class="timeline-dot done">&#10003;</div>
+                    <div class="timeline-label">Delivered</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Letter -->
+            <div class="mock-card mb-2">
+              <div style="background: #f9fafb; padding: 0.625rem 1rem; border-bottom: 1px solid #e5e7eb;">
+                <span style="font-size: 0.8125rem; color: #6b7280;">Subject: </span>
+                <span style="font-size: 0.8125rem; font-weight: 500;">Formal Complaint Regarding Billing Error &mdash; Account #12345</span>
+              </div>
+              <div style="padding: 1rem 1.25rem; font-family: Georgia, serif; font-size: 0.8125rem; color: #4b5563; line-height: 1.7;">
+                Dear Sir/Madam,<br><br>
+                I am writing to formally complain about an incorrect charge of &pound;47.99 applied to my account on 5 March 2026...<br><br>
+                <span style="color: #9ca3af;">[Full letter body displayed here]</span><br><br>
+                Yours faithfully,<br>
+                Nick Ball
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <button class="mock-btn mock-btn-primary">&#128203; Copy letter</button>
+              <button class="mock-btn mock-btn-secondary">&#9993; Open in email client</button>
+              <button class="mock-btn mock-btn-ghost">&#8635; Generate new version</button>
+            </div>
+
+            <!-- Complaint context -->
+            <div class="mock-card mt-1">
+              <div style="padding: 1rem 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 0.75rem;">Original complaint details</div>
+                <table>
+                  <tbody>
+                    <tr><td style="font-weight: 500; width: 140px;">Recipient</td><td>Vodafone (Company)</td></tr>
+                    <tr><td style="font-weight: 500;">Category</td><td>Billing</td></tr>
+                    <tr><td style="font-weight: 500;">Description</td><td>I was overcharged &pound;47.99 on my March bill despite cancelling the add-on...</td></tr>
+                    <tr><td style="font-weight: 500;">Desired outcome</td><td>Full refund and confirmation the add-on is cancelled</td></tr>
+                    <tr><td style="font-weight: 500;">Date of incident</td><td>5 March 2026</td></tr>
+                    <tr><td style="font-weight: 500;">Reference</td><td>Account #12345</td></tr>
+                    <tr><td style="font-weight: 500;">Created</td><td>17 March 2026</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="state-note">
+        <strong>Draft/generated state variant</strong>
+        If the user navigates here for a complaint that hasn't been delivered yet (status = draft or generated), the delivery actions are highlighted more prominently with a banner: "This complaint hasn't been sent yet &mdash; deliver it now." The copy/mailto buttons become the primary CTA.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ALL STATES ============ -->
+  <div class="section" id="states">
+    <div class="section-header">
+      <h2>State Handling</h2>
+      <p>Loading, error, and edge-case states for every new screen.</p>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead>
+          <tr><th>Screen</th><th>State</th><th>Behaviour</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Dashboard</td><td>Loading</td><td>3 skeleton rows with pulse animation (same rounded-card shape as complaint rows)</td></tr>
+          <tr><td>Dashboard</td><td>Empty</td><td>Illustrated empty state with CTA to create first complaint (see wireframe above)</td></tr>
+          <tr><td>Dashboard</td><td>Error</td><td>Red inline banner: "Couldn't load your complaints. Try refreshing." with retry button</td></tr>
+          <tr><td>Complaint detail</td><td>Loading</td><td>Skeleton placeholders for header, timeline, letter card</td></tr>
+          <tr><td>Complaint detail</td><td>Not found / wrong user</td><td>Redirect to /dashboard with toast: "Complaint not found"</td></tr>
+          <tr><td>Deliver step</td><td>Save error (PATCH fails)</td><td>Non-blocking: delivery still works, red inline note "Couldn't save to your history &mdash; you can still copy/email your letter"</td></tr>
+          <tr><td>Deliver step</td><td>Clipboard API fails</td><td>Fallback to textarea select + execCommand (existing behaviour, no change)</td></tr>
+          <tr><td>Success</td><td>Normal</td><td>Show success overlay with ref code, localStorage cleared</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ RESPONSIVE ============ -->
+  <div class="section" id="responsive">
+    <div class="section-header">
+      <h2>Responsive Behaviour</h2>
+      <p>All new screens must work on mobile (375px+), tablet (768px+), and desktop (1024px+).</p>
+    </div>
+    <div class="section-body">
+      <div class="responsive-note">
+        <div class="device">
+          <div class="device-label">Mobile (375px+)</div>
+          <div class="device-desc">
+            Complaint rows: stack badge below meta text.<br>
+            Detail page: single column, full-width buttons.<br>
+            Timeline: horizontal with smaller dots, labels hidden on &lt;400px.
+          </div>
+        </div>
+        <div class="device">
+          <div class="device-label">Tablet (768px+)</div>
+          <div class="device-desc">
+            Complaint rows: badge and chevron inline.<br>
+            Detail page: same as desktop but narrower padding.<br>
+            Delivery buttons: side-by-side (existing 2-col grid).
+          </div>
+        </div>
+        <div class="device">
+          <div class="device-label">Desktop (1024px+)</div>
+          <div class="device-desc">
+            Max-width container (existing max-w-4xl).<br>
+            All elements comfortably spaced.<br>
+            Full timeline labels visible.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ACCESSIBILITY ============ -->
+  <div class="section" id="a11y">
+    <div class="section-header">
+      <h2>Accessibility (WCAG 2.1 AA)</h2>
+      <p>Checklist for implementation.</p>
+    </div>
+    <div class="section-body">
+      <ul class="a11y-list">
+        <li>All status badges use both colour AND text labels (not colour-only)</li>
+        <li>Complaint rows are keyboard-navigable (focusable, Enter/Space to activate)</li>
+        <li>Success overlay announced via aria-live="polite" region</li>
+        <li>Timeline steps have aria-label describing status (e.g. "Draft: completed")</li>
+        <li>"Copy to clipboard" button has aria-live feedback ("Copied to clipboard" announced)</li>
+        <li>Back link on detail page has aria-label="Back to complaint history"</li>
+        <li>Empty state CTA is a real link/button, not just styled text</li>
+        <li>All colour contrast ratios meet 4.5:1 minimum (badges, muted text verified)</li>
+        <li>Form inputs maintain existing focus ring styles (ring-2 ring-blue-600)</li>
+        <li>Tab order follows visual order on all screen sizes</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ KEYBOARD NAV ============ -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Keyboard &amp; Screen Reader Walkthrough</h2>
+      <p>Complete interaction flow via keyboard only.</p>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Step</th><th>Tab focus</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard</td><td>"New Complaint" button</td><td>Enter &rarr; navigates to /dashboard/new-complaint</td></tr>
+          <tr><td>Dashboard</td><td>Each complaint row</td><td>Enter &rarr; navigates to detail. Screen reader announces: "[Recipient], [Category], [Status]"</td></tr>
+          <tr><td>Detail</td><td>"Back to dashboard" link</td><td>Enter &rarr; returns to dashboard</td></tr>
+          <tr><td>Detail</td><td>"Copy letter" button</td><td>Enter &rarr; copies, announces "Letter copied to clipboard"</td></tr>
+          <tr><td>Deliver</td><td>"Copy to clipboard" button</td><td>Enter &rarr; copies, shows success after 1.5s. Focus moves to success overlay.</td></tr>
+          <tr><td>Success</td><td>"View in complaint history" button</td><td>Enter &rarr; navigates to dashboard</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
