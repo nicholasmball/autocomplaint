@@ -22,6 +22,9 @@ export function NavBar({ userEmail }: { userEmail: string }) {
         </Link>
 
         <div className="flex items-center gap-4 text-sm">
+          <Link href="/dashboard/admin/recipients" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+            Recipients
+          </Link>
           <Link href="/profile" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
             Profile
           </Link>
