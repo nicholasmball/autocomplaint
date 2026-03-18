@@ -71,14 +71,19 @@ export function WizardProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Restore draft from localStorage on mount
+  // Restore draft from localStorage on mount — only if it's an in-progress draft
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
         const parsed = JSON.parse(saved)
-        if (parsed.state) setState(parsed.state)
-        if (parsed.step) setStep(parsed.step)
+        if (parsed.step && parsed.step >= 6) {
+          // Completed complaint — clear stale draft
+          localStorage.removeItem(STORAGE_KEY)
+        } else {
+          if (parsed.state) setState(parsed.state)
+          if (parsed.step) setStep(parsed.step)
+        }
       }
     } catch {
       // ignore corrupt data
