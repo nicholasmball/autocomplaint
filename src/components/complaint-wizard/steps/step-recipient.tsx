@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useWizard } from '../wizard-context'
+import { RecipientAutocomplete } from '@/components/recipient-autocomplete'
 import type { RecipientType } from '@/services/complaint-generator/types'
 
 const RECIPIENT_TYPES: { value: RecipientType; label: string; icon: string; desc: string }[] = [
@@ -123,13 +124,16 @@ export function StepRecipient() {
             <label htmlFor="company-name" className="block text-sm font-medium mb-1">
               Company name
             </label>
-            <input
+            <RecipientAutocomplete
               id="company-name"
-              type="text"
+              type="company"
               value={state.recipientName}
-              onChange={(e) => update({ recipientName: e.target.value })}
+              onChange={(name) => update({ recipientName: name })}
+              onSelect={(result) => update({
+                recipientName: result.name,
+                recipientEmail: result.complaint_email || state.recipientEmail,
+              })}
               placeholder="e.g., British Gas, Sky, BT"
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             />
           </div>
           <div>
@@ -220,13 +224,16 @@ export function StepRecipient() {
             <label htmlFor="regulator-name" className="block text-sm font-medium mb-1">
               Regulator or ombudsman name
             </label>
-            <input
+            <RecipientAutocomplete
               id="regulator-name"
-              type="text"
+              type="regulator"
               value={state.recipientName}
-              onChange={(e) => update({ recipientName: e.target.value })}
+              onChange={(name) => update({ recipientName: name })}
+              onSelect={(result) => update({
+                recipientName: result.name,
+                recipientEmail: result.complaint_email || state.recipientEmail,
+              })}
               placeholder="e.g., Ofcom, Financial Ombudsman Service"
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             />
           </div>
           <div>

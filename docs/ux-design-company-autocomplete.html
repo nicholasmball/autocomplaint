@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX Design: Company Autocomplete Search</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { background: #f9fafb; }
+  .section-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+  .mockup-frame { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .design-note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #92400e; margin-top: 12px; }
+</style>
+</head>
+<body class="p-8 max-w-4xl mx-auto">
+
+<h1 class="text-2xl font-bold mb-2">Company Autocomplete — UX Design</h1>
+<p class="text-sm text-gray-500 mb-8">Building on the <strong>Requirements</strong> step. Covers: autocomplete dropdown, loading/empty states, keyboard navigation, and mobile layout.</p>
+
+<!-- ========== STATE 1: Empty / Initial ========== -->
+<p class="section-label">1. Initial State — Company Selected, No Input Yet</p>
+
+<div class="mockup-frame">
+  <div class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Company name</label>
+      <div class="relative">
+        <input type="text" placeholder="e.g., British Gas, Sky, BT" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" value="">
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">
+        Complaint email address
+        <span class="font-normal text-gray-400">(optional — you can add this later)</span>
+      </label>
+      <input type="email" placeholder="e.g., complaints@britishgas.co.uk" class="w-full border rounded-md px-3 py-2 text-sm">
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>Initial state:</strong> Same layout as before. Autocomplete only activates after 2+ characters (AC #2). Email field remains separate and editable (AC #6).
+  </div>
+</div>
+
+<!-- ========== STATE 2: Typing with Results ========== -->
+<p class="section-label">2. Typing — Results Found</p>
+
+<div class="mockup-frame">
+  <div class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Company name</label>
+      <div class="relative">
+        <input type="text" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" value="brit">
+        <!-- Dropdown -->
+        <ul class="absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-md border border-gray-200 bg-white shadow-lg">
+          <li class="cursor-pointer px-3 py-2 text-sm bg-blue-50 text-blue-900">
+            <div class="font-medium">British Gas</div>
+            <div class="text-xs text-gray-500">Energy</div>
+            <div class="text-xs text-gray-400">complaints@britishgas.co.uk</div>
+          </li>
+          <li class="cursor-pointer px-3 py-2 text-sm text-gray-900">
+            <div class="font-medium">British Airways</div>
+            <div class="text-xs text-gray-500">Travel</div>
+            <div class="text-xs text-gray-400">customer.relations@ba.com</div>
+          </li>
+          <li class="cursor-pointer px-3 py-2 text-sm text-gray-900">
+            <div class="font-medium">British Gas Services</div>
+            <div class="text-xs text-gray-500">Home Services</div>
+            <div class="text-xs text-gray-400">complaints@britishgas.co.uk</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>Results dropdown:</strong> Each row shows name (bold), sector (small gray), and email (smallest gray). First item is highlighted (AC #9 — keyboard). Max 10 results (AC #3). Dropdown appears below input, full width. Arrow keys move highlight, Enter selects, Escape closes.
+  </div>
+</div>
+
+<!-- ========== STATE 3: Loading ========== -->
+<p class="section-label">3. Loading State</p>
+
+<div class="mockup-frame">
+  <div>
+    <label class="block text-sm font-medium mb-1">Company name</label>
+    <div class="relative">
+      <input type="text" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" value="tes">
+      <div class="absolute right-3 top-1/2 -translate-y-1/2">
+        <svg class="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>Loading:</strong> Spinner in the right side of the input while the debounced search is in flight (AC #8). No dropdown shown until results arrive.
+  </div>
+</div>
+
+<!-- ========== STATE 4: No Results ========== -->
+<p class="section-label">4. No Results Found</p>
+
+<div class="mockup-frame">
+  <div>
+    <label class="block text-sm font-medium mb-1">Company name</label>
+    <div class="relative">
+      <input type="text" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" value="Acme Corp Ltd">
+      <div class="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg px-3 py-2 text-sm text-gray-500">
+        No matches found — enter details manually
+      </div>
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>Empty state:</strong> Non-interactive message (AC #5). Input remains editable — user continues typing their custom company name (AC #6). Dropdown dismisses on blur or further typing below 2 chars.
+  </div>
+</div>
+
+<!-- ========== STATE 5: Selection Made ========== -->
+<p class="section-label">5. After Selection — Email Auto-filled</p>
+
+<div class="mockup-frame">
+  <div class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Company name</label>
+      <input type="text" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" value="British Gas">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">
+        Complaint email address
+        <span class="font-normal text-gray-400">(optional — you can add this later)</span>
+      </label>
+      <input type="email" class="w-full border rounded-md px-3 py-2 text-sm" value="complaints@britishgas.co.uk">
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>Post-selection:</strong> Company name fills the input, dropdown closes, email field auto-populates (AC #4). User can still edit both fields manually (AC #6). The email only auto-fills if the company has one — otherwise it stays empty.
+  </div>
+</div>
+
+<!-- ========== STATE 6: Regulator Autocomplete ========== -->
+<p class="section-label">6. Regulator Autocomplete — Same Component</p>
+
+<div class="mockup-frame">
+  <div>
+    <label class="block text-sm font-medium mb-1">Regulator or ombudsman name</label>
+    <div class="relative">
+      <input type="text" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" value="ofco">
+      <ul class="absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-md border border-gray-200 bg-white shadow-lg">
+        <li class="cursor-pointer px-3 py-2 text-sm bg-blue-50 text-blue-900">
+          <div class="font-medium">Ofcom</div>
+          <div class="text-xs text-gray-500">Ofcom — Telecoms</div>
+          <div class="text-xs text-gray-400">contact@ofcom.org.uk</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>Reusable component:</strong> Same `RecipientAutocomplete` with `type="regulator"` prop (AC #7). Subtitle shows abbreviation + sector. Searches both name and abbreviation fields.
+  </div>
+</div>
+
+<!-- ========== SECTION: Interaction Flow ========== -->
+<p class="section-label">7. Interaction Flow</p>
+
+<div class="mockup-frame">
+  <div class="text-sm space-y-2">
+    <p><strong>Trigger:</strong> User types 2+ characters → 300ms debounce → API call (AC #2, #8)</p>
+    <p><strong>Results:</strong> Dropdown opens with up to 10 matches (AC #3)</p>
+    <p><strong>Selection:</strong> Click or Enter → name fills input, email auto-populates, dropdown closes (AC #4)</p>
+    <p><strong>No match:</strong> "No matches found" message, input stays editable (AC #5, #6)</p>
+    <p><strong>Dismiss:</strong> Click outside, Escape, or clearing input below 2 chars closes dropdown</p>
+    <p><strong>Keyboard:</strong> Tab to input → type → Arrow Down/Up to navigate → Enter to select → Escape to close (AC #9)</p>
+  </div>
+</div>
+
+<!-- ========== SECTION: Accessibility ========== -->
+<p class="section-label">8. Accessibility</p>
+
+<div class="mockup-frame">
+  <div class="text-sm space-y-2">
+    <p><strong>ARIA:</strong> Input has <code>role="combobox"</code>, <code>aria-expanded</code>, <code>aria-controls</code>, <code>aria-activedescendant</code>, <code>aria-autocomplete="list"</code></p>
+    <p><strong>Listbox:</strong> Dropdown has <code>role="listbox"</code>, each item has <code>role="option"</code> with <code>aria-selected</code></p>
+    <p><strong>Active item:</strong> Scrolls into view on arrow key navigation</p>
+    <p><strong>Screen reader:</strong> Announces "X results available" when dropdown opens (via aria-live region)</p>
+  </div>
+</div>
+
+</body>
+</html>
