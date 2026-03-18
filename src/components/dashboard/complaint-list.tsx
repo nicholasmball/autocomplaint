@@ -8,6 +8,7 @@ import {
   CATEGORY_ICONS,
   CATEGORY_LABELS,
   STATUS_STYLES,
+  RESPONSE_STATUS_BADGES,
   SortOption,
   relativeDate,
 } from './types'
@@ -126,6 +127,16 @@ export function ComplaintList({ complaints }: ComplaintListProps) {
               <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[complaint.status] || STATUS_STYLES.draft}`}>
                 {complaint.status}
               </span>
+              {(complaint.status === 'delivered' || complaint.status === 'sent') && complaint.response_status && RESPONSE_STATUS_BADGES[complaint.response_status] && (
+                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${RESPONSE_STATUS_BADGES[complaint.response_status].style}`}>
+                  {RESPONSE_STATUS_BADGES[complaint.response_status].label}
+                </span>
+              )}
+              {(complaint.status === 'delivered' || complaint.status === 'sent') && complaint.follow_up_date && new Date(complaint.follow_up_date) < new Date() && complaint.response_status !== 'resolved' && (
+                <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+                  overdue
+                </span>
+              )}
               {hasLetter(complaint) && (
                 <QuickActions
                   compact
@@ -162,9 +173,21 @@ export function ComplaintList({ complaints }: ComplaintListProps) {
                   {relativeDate(complaint.created_at)}
                 </p>
               </div>
-              <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize shrink-0 ml-2 ${STATUS_STYLES[complaint.status] || STATUS_STYLES.draft}`}>
-                {complaint.status}
-              </span>
+              <div className="flex items-center gap-1 shrink-0 ml-2">
+                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[complaint.status] || STATUS_STYLES.draft}`}>
+                  {complaint.status}
+                </span>
+                {(complaint.status === 'delivered' || complaint.status === 'sent') && complaint.response_status && RESPONSE_STATUS_BADGES[complaint.response_status] && (
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${RESPONSE_STATUS_BADGES[complaint.response_status].style}`}>
+                    {RESPONSE_STATUS_BADGES[complaint.response_status].label}
+                  </span>
+                )}
+                {(complaint.status === 'delivered' || complaint.status === 'sent') && complaint.follow_up_date && new Date(complaint.follow_up_date) < new Date() && complaint.response_status !== 'resolved' && (
+                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+                    overdue
+                  </span>
+                )}
+              </div>
             </div>
 
             {complaint.generated_subject ? (

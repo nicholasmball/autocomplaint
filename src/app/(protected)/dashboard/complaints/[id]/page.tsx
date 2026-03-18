@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ComplaintActions } from './complaint-actions'
+import { ResponseTracker } from './response-tracker'
 
 const CATEGORY_LABELS: Record<string, string> = {
   'billing': 'Billing',
@@ -166,6 +167,21 @@ export default async function ComplaintDetailPage({
           letter={complaint.generated_letter}
           recipientEmail={complaint.recipient_email || ''}
         />
+      )}
+
+      {/* Response tracking */}
+      {(complaint.status === 'delivered' || complaint.status === 'sent') && (
+        <div className="mt-6">
+          <ResponseTracker
+            complaintId={complaint.id}
+            initialStatus={complaint.response_status || 'awaiting'}
+            initialDate={complaint.response_date}
+            initialSummary={complaint.response_summary}
+            initialSatisfactory={complaint.response_satisfactory}
+            initialFollowUpDate={complaint.follow_up_date}
+            initialEscalatedTo={complaint.escalated_to}
+          />
+        </div>
       )}
 
       {/* Original complaint details */}

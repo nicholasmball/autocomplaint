@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX Design: Response Tracking System</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { background: #f9fafb; }
+  .section-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+  .mockup-frame { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .design-note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #92400e; margin-top: 12px; }
+</style>
+</head>
+<body class="p-8 max-w-4xl mx-auto">
+
+<h1 class="text-2xl font-bold mb-2">Response Tracking — UX Design</h1>
+<p class="text-sm text-gray-500 mb-8">Building on the <strong>Requirements</strong> step. Covers: complaint detail page tracker, dashboard badges, and interaction flows.</p>
+
+<!-- ========== SECTION 1: Complaint Detail — Response Tracker ========== -->
+<p class="section-label">1. Complaint Detail Page — Response Tracker Component</p>
+<p class="text-sm text-gray-600 mb-4">Appears below the complaint actions, only when status is <code>delivered</code> or <code>sent</code>. Per AC #1.</p>
+
+<!-- State: Awaiting (default) -->
+<div class="mockup-frame">
+  <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Response tracking</p>
+  <div class="space-y-4">
+    <div>
+      <p class="text-sm font-medium mb-2">Status</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 ring-2 ring-offset-1 ring-blue-500">Awaiting response</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Responded</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">No response</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Escalated</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Resolved</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 pt-2">
+      <button class="inline-flex items-center gap-2 rounded-md bg-blue-600 text-white px-4 py-2 text-sm font-medium">Save</button>
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>Default state:</strong> "Awaiting response" is pre-selected. No extra fields shown. User can just save, or change status to reveal contextual fields.
+  </div>
+</div>
+
+<!-- State: Responded -->
+<div class="mockup-frame">
+  <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Response tracking</p>
+  <div class="space-y-4">
+    <div>
+      <p class="text-sm font-medium mb-2">Status</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Awaiting response</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 ring-2 ring-offset-1 ring-blue-500">Responded</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">No response</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Escalated</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Resolved</span>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Response date</label>
+      <input type="date" value="2026-03-15" class="border rounded-md px-3 py-2 text-sm">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Response summary</label>
+      <textarea rows="3" class="w-full border rounded-md px-3 py-2 text-sm" placeholder="What did they say?">They offered a £50 goodwill credit but did not address the billing error directly.</textarea>
+    </div>
+
+    <div>
+      <p class="text-sm font-medium mb-2">Was the response satisfactory?</p>
+      <div class="flex gap-3">
+        <button class="px-4 py-1.5 rounded-md text-sm font-medium border border-gray-200 text-gray-500">Yes</button>
+        <button class="px-4 py-1.5 rounded-md text-sm font-medium border border-red-600 bg-red-50 text-red-700">No</button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 pt-2">
+      <button class="inline-flex items-center gap-2 rounded-md bg-blue-600 text-white px-4 py-2 text-sm font-medium">Save</button>
+      <span class="text-sm text-green-600">Saved ✓</span>
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>"Responded" state:</strong> Shows date, summary, and satisfactory toggle. Per AC #2 and #3. Save confirmation appears inline for 3 seconds (AC #4).
+  </div>
+</div>
+
+<!-- State: Escalated -->
+<div class="mockup-frame">
+  <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Response tracking</p>
+  <div class="space-y-4">
+    <div>
+      <p class="text-sm font-medium mb-2">Status</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Awaiting response</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Responded</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">No response</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-red-100 text-red-700 ring-2 ring-offset-1 ring-blue-500">Escalated</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Resolved</span>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Reason for escalation</label>
+      <textarea rows="3" class="w-full border rounded-md px-3 py-2 text-sm" placeholder="Why are you escalating this complaint?">Unsatisfactory response — they ignored the core billing issue.</textarea>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Escalated to</label>
+      <input type="text" value="Financial Ombudsman Service" class="w-full border rounded-md px-3 py-2 text-sm" placeholder="e.g., Financial Ombudsman, MP, CEO office">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Follow-up date</label>
+      <input type="date" value="2026-04-01" class="border rounded-md px-3 py-2 text-sm">
+    </div>
+
+    <div class="flex items-center gap-3 pt-2">
+      <button class="inline-flex items-center gap-2 rounded-md bg-blue-600 text-white px-4 py-2 text-sm font-medium">Save</button>
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>"Escalated" state:</strong> Shows reason (relabelled summary field), escalated-to input, and follow-up date. Per AC #3. The "escalated to" field could later link to the regulator/ombudsman database for autocomplete.
+  </div>
+</div>
+
+<!-- State: No Response -->
+<div class="mockup-frame">
+  <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Response tracking</p>
+  <div class="space-y-4">
+    <div>
+      <p class="text-sm font-medium mb-2">Status</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Awaiting response</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Responded</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 ring-2 ring-offset-1 ring-blue-500">No response</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Escalated</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-400">Resolved</span>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Response summary</label>
+      <textarea rows="3" class="w-full border rounded-md px-3 py-2 text-sm" placeholder="Any notes about follow-up attempts..."></textarea>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Follow-up date</label>
+      <input type="date" class="border rounded-md px-3 py-2 text-sm">
+    </div>
+
+    <div class="flex items-center gap-3 pt-2">
+      <button class="inline-flex items-center gap-2 rounded-md bg-blue-600 text-white px-4 py-2 text-sm font-medium">Save</button>
+    </div>
+  </div>
+  <div class="design-note">
+    <strong>"No response" state:</strong> Shows notes field and follow-up date. Useful for recording that you've chased them.
+  </div>
+</div>
+
+<!-- ========== SECTION 2: Dashboard Badges ========== -->
+<p class="section-label">2. Dashboard Complaint List — Response Status Badges</p>
+<p class="text-sm text-gray-600 mb-4">Per AC #5 and #8. Response badges appear on delivered/sent complaints in the dashboard list.</p>
+
+<div class="mockup-frame">
+  <div class="space-y-3">
+    <!-- Complaint row: awaiting -->
+    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+      <div>
+        <p class="text-sm font-medium">Complaint to British Gas</p>
+        <p class="text-xs text-gray-400">Billing · 12 Mar 2026</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">delivered</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">⏳ awaiting</span>
+      </div>
+    </div>
+
+    <!-- Complaint row: responded, unsatisfactory -->
+    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+      <div>
+        <p class="text-sm font-medium">Complaint to Sky</p>
+        <p class="text-xs text-gray-400">Poor Service · 5 Mar 2026</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">sent</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">💬 responded</span>
+      </div>
+    </div>
+
+    <!-- Complaint row: escalated -->
+    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+      <div>
+        <p class="text-sm font-medium">Complaint to HSBC</p>
+        <p class="text-xs text-gray-400">Contract Dispute · 20 Feb 2026</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">delivered</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">⬆ escalated</span>
+      </div>
+    </div>
+
+    <!-- Complaint row: no response, overdue follow-up -->
+    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+      <div>
+        <p class="text-sm font-medium">Complaint to Thames Water</p>
+        <p class="text-xs text-gray-400">Billing · 1 Feb 2026</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">delivered</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">⚠ no response</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">overdue</span>
+      </div>
+    </div>
+
+    <!-- Complaint row: resolved -->
+    <div class="flex items-center justify-between pb-1">
+      <div>
+        <p class="text-sm font-medium">Complaint to Vodafone</p>
+        <p class="text-xs text-gray-400">Data Privacy · 15 Jan 2026</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">delivered</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">✓ resolved</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="design-note">
+    <strong>Dashboard badges:</strong> Response status appears as a second badge next to the delivery status. Per AC #8, overdue follow-ups get a red "overdue" badge (follow_up_date &lt; today). Complaints in <code>draft</code>/<code>generated</code> status don't show response badges.
+  </div>
+</div>
+
+<!-- ========== SECTION 3: Interaction Flow ========== -->
+<p class="section-label">3. Interaction Flow</p>
+
+<div class="mockup-frame">
+  <div class="text-sm space-y-2">
+    <p><strong>Entry:</strong> User views a delivered/sent complaint → tracker section visible at bottom</p>
+    <p><strong>Status change:</strong> Click a status pill → relevant fields animate in (200ms ease-out) → previous fields animate out</p>
+    <p><strong>Save:</strong> Click Save → button shows "Saving..." → PATCH request → "Saved ✓" for 3s</p>
+    <p><strong>Error:</strong> If save fails → red inline error "Failed to save — please try again."</p>
+    <p><strong>Dashboard:</strong> Response badge updates on next page load (no real-time needed)</p>
+    <p><strong>Overdue:</strong> If follow_up_date &lt; today and status is awaiting/no_response/escalated → red "overdue" badge on dashboard</p>
+  </div>
+
+  <div class="design-note">
+    <strong>Keyboard nav:</strong> Status pills are focusable via Tab, selectable via Enter/Space. Form fields follow standard tab order. Save button is last in tab order.
+  </div>
+</div>
+
+<!-- ========== SECTION 4: Field Visibility Matrix ========== -->
+<p class="section-label">4. Field Visibility by Status</p>
+
+<div class="mockup-frame overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-left border-b">
+        <th class="py-2 pr-4 font-medium text-gray-500">Field</th>
+        <th class="py-2 px-2 font-medium text-gray-500">Awaiting</th>
+        <th class="py-2 px-2 font-medium text-gray-500">Responded</th>
+        <th class="py-2 px-2 font-medium text-gray-500">No response</th>
+        <th class="py-2 px-2 font-medium text-gray-500">Escalated</th>
+        <th class="py-2 px-2 font-medium text-gray-500">Resolved</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-gray-50"><td class="py-1.5 pr-4">Response date</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">✓</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">✓</td></tr>
+      <tr class="border-b border-gray-50"><td class="py-1.5 pr-4">Summary / Reason</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">✓</td><td class="py-1.5 px-2">✓</td><td class="py-1.5 px-2">✓</td><td class="py-1.5 px-2">✓</td></tr>
+      <tr class="border-b border-gray-50"><td class="py-1.5 pr-4">Satisfactory?</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">✓</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">✓</td></tr>
+      <tr class="border-b border-gray-50"><td class="py-1.5 pr-4">Escalated to</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">✓</td><td class="py-1.5 px-2">—</td></tr>
+      <tr><td class="py-1.5 pr-4">Follow-up date</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">—</td><td class="py-1.5 px-2">✓</td><td class="py-1.5 px-2">✓</td><td class="py-1.5 px-2">—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

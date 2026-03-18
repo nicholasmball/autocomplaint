@@ -34,6 +34,12 @@ export async function PATCH(
     generatedLetter: 'generated_letter',
     generatedSubject: 'generated_subject',
     recipientEmail: 'recipient_email',
+    responseStatus: 'response_status',
+    responseDate: 'response_date',
+    responseSummary: 'response_summary',
+    responseSatisfactory: 'response_satisfactory',
+    followUpDate: 'follow_up_date',
+    escalatedTo: 'escalated_to',
   }
 
   const updates: Record<string, unknown> = {}
@@ -52,6 +58,14 @@ export async function PATCH(
     const validStatuses = ['draft', 'generated', 'reviewed', 'delivered', 'sent']
     if (!validStatuses.includes(updates.status as string)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    }
+  }
+
+  // Validate response_status
+  if (updates.response_status) {
+    const validResponseStatuses = ['awaiting', 'responded', 'no_response', 'escalated', 'resolved']
+    if (!validResponseStatuses.includes(updates.response_status as string)) {
+      return NextResponse.json({ error: 'Invalid response status' }, { status: 400 })
     }
   }
 

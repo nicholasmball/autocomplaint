@@ -19,7 +19,7 @@ async function DashboardContent() {
 
   const { data: complaints, error } = await supabase
     .from('complaints')
-    .select('id, recipient_name, recipient_type, recipient_email, category, status, delivery_method, generated_subject, generated_letter, created_at')
+    .select('id, recipient_name, recipient_type, recipient_email, category, status, delivery_method, generated_subject, generated_letter, created_at, response_status, follow_up_date')
     .eq('user_id', user!.id)
     .order('created_at', { ascending: false })
 
