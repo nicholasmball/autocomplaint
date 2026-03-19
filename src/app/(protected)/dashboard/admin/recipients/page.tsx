@@ -120,20 +120,20 @@ export default function RecipientsAdminPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">Recipient Database</h1>
-        <span className="text-sm text-gray-500 dark:text-gray-400">{total} records</span>
+        <h1 className="font-serif text-xl">Recipient Database</h1>
+        <span className="text-sm text-slate-400 dark:text-slate-400">{total} records</span>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex gap-1 mb-4 border-b border-slate-200 dark:border-slate-700">
         {TABS.map((t) => (
           <button
             key={t.value}
             onClick={() => switchTable(t.value)}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               table === t.value
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                ? 'border-amber-500 text-amber-600 dark:text-amber-400'
+                : 'border-transparent text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-300'
             }`}
           >
             {t.label}
@@ -148,11 +148,11 @@ export default function RecipientsAdminPage() {
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1) }}
           placeholder="Search..."
-          className="flex-1 border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="flex-1 border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
         />
         <button
           onClick={() => { setAdding(!adding); setNewRecord({}) }}
-          className="bg-blue-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-blue-700"
+          className="bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 rounded-xl px-4 py-2 text-sm font-medium hover:bg-slate-800 dark:hover:bg-amber-400"
         >
           {adding ? 'Cancel' : 'Add new'}
         </button>
@@ -160,20 +160,20 @@ export default function RecipientsAdminPage() {
 
       {/* Add form */}
       {adding && (
-        <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 p-4 mb-4 space-y-3">
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 p-4 mb-4 space-y-3">
           <input
             type="text"
             placeholder="Name *"
             value={newRecord.name || ''}
             onChange={(e) => setNewRecord(prev => ({ ...prev, name: e.target.value }))}
-            className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+            className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
           />
           <input
             type="email"
             placeholder="Complaint email"
             value={newRecord.complaint_email || ''}
             onChange={(e) => setNewRecord(prev => ({ ...prev, complaint_email: e.target.value }))}
-            className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+            className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
           />
           {table === 'companies' && (
             <input
@@ -181,7 +181,7 @@ export default function RecipientsAdminPage() {
               placeholder="Sector"
               value={newRecord.sector || ''}
               onChange={(e) => setNewRecord(prev => ({ ...prev, sector: e.target.value }))}
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+              className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
             />
           )}
           {table === 'councils' && (
@@ -189,7 +189,7 @@ export default function RecipientsAdminPage() {
               <select
                 value={newRecord.council_type || 'unitary'}
                 onChange={(e) => setNewRecord(prev => ({ ...prev, council_type: e.target.value }))}
-                className="border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                className="border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
               >
                 {COUNCIL_TYPES.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
               </select>
@@ -198,7 +198,7 @@ export default function RecipientsAdminPage() {
                 placeholder="Region"
                 value={newRecord.region || ''}
                 onChange={(e) => setNewRecord(prev => ({ ...prev, region: e.target.value }))}
-                className="flex-1 border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                className="flex-1 border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
               />
             </div>
           )}
@@ -210,14 +210,14 @@ export default function RecipientsAdminPage() {
                   placeholder="Abbreviation"
                   value={newRecord.abbreviation || ''}
                   onChange={(e) => setNewRecord(prev => ({ ...prev, abbreviation: e.target.value }))}
-                  className="w-32 border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                  className="w-32 border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
                 />
                 <input
                   type="text"
                   placeholder="Sector"
                   value={newRecord.sector || ''}
                   onChange={(e) => setNewRecord(prev => ({ ...prev, sector: e.target.value }))}
-                  className="flex-1 border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                  className="flex-1 border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
                 />
               </div>
               <input
@@ -225,14 +225,14 @@ export default function RecipientsAdminPage() {
                 placeholder="Description"
                 value={newRecord.description || ''}
                 onChange={(e) => setNewRecord(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
               />
             </>
           )}
           <button
             onClick={addRecord}
             disabled={!newRecord.name}
-            className="bg-green-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+            className="bg-green-600 text-white rounded-xl px-4 py-2 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
           >
             Save
           </button>
@@ -240,25 +240,25 @@ export default function RecipientsAdminPage() {
       )}
 
       {/* Table */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 dark:bg-gray-800/50">
+          <thead className="bg-slate-50 dark:bg-white/5">
             <tr>
-              <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Name</th>
-              {table === 'companies' && <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Sector</th>}
-              {table === 'councils' && <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Type</th>}
-              {table === 'regulators' && <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Abbr</th>}
-              <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Email</th>
-              <th className="text-right px-4 py-2 font-medium text-gray-500 dark:text-gray-400 w-28">Actions</th>
+              <th className="text-left px-4 py-2 font-medium text-slate-400 dark:text-slate-400">Name</th>
+              {table === 'companies' && <th className="text-left px-4 py-2 font-medium text-slate-400 dark:text-slate-400">Sector</th>}
+              {table === 'councils' && <th className="text-left px-4 py-2 font-medium text-slate-400 dark:text-slate-400">Type</th>}
+              {table === 'regulators' && <th className="text-left px-4 py-2 font-medium text-slate-400 dark:text-slate-400">Abbr</th>}
+              <th className="text-left px-4 py-2 font-medium text-slate-400 dark:text-slate-400">Email</th>
+              <th className="text-right px-4 py-2 font-medium text-slate-400 dark:text-slate-400 w-28">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {loading ? (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400">Loading...</td></tr>
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-slate-300">Loading...</td></tr>
             ) : data.length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400">No records found</td></tr>
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-slate-300">No records found</td></tr>
             ) : data.map((r) => (
-              <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/30">
+              <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-white/5">
                 {editing === r.id ? (
                   <>
                     <td className="px-4 py-2">
@@ -266,7 +266,7 @@ export default function RecipientsAdminPage() {
                         type="text"
                         value={editValues.name || ''}
                         onChange={(e) => setEditValues(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                        className="w-full border rounded px-2 py-1 text-sm dark:bg-slate-900/50 dark:border-slate-700"
                       />
                     </td>
                     <td className="px-4 py-2">
@@ -277,7 +277,7 @@ export default function RecipientsAdminPage() {
                           const key = table === 'companies' ? 'sector' : table === 'councils' ? 'council_type' : 'abbreviation'
                           setEditValues(prev => ({ ...prev, [key]: e.target.value }))
                         }}
-                        className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                        className="w-full border rounded px-2 py-1 text-sm dark:bg-slate-900/50 dark:border-slate-700"
                       />
                     </td>
                     <td className="px-4 py-2">
@@ -285,25 +285,25 @@ export default function RecipientsAdminPage() {
                         type="text"
                         value={editValues.complaint_email || ''}
                         onChange={(e) => setEditValues(prev => ({ ...prev, complaint_email: e.target.value }))}
-                        className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                        className="w-full border rounded px-2 py-1 text-sm dark:bg-slate-900/50 dark:border-slate-700"
                       />
                     </td>
                     <td className="px-4 py-2 text-right">
                       <button onClick={() => saveEdit(r.id)} className="text-green-600 hover:text-green-700 text-xs font-medium mr-2">Save</button>
-                      <button onClick={() => setEditing(null)} className="text-gray-400 hover:text-gray-600 text-xs font-medium">Cancel</button>
+                      <button onClick={() => setEditing(null)} className="text-slate-300 hover:text-slate-500 text-xs font-medium">Cancel</button>
                     </td>
                   </>
                 ) : (
                   <>
-                    <td className="px-4 py-2 font-medium text-gray-900 dark:text-gray-100">{r.name}</td>
-                    <td className="px-4 py-2 text-gray-500 dark:text-gray-400">
+                    <td className="px-4 py-2 font-medium text-slate-900 dark:text-white">{r.name}</td>
+                    <td className="px-4 py-2 text-slate-400 dark:text-slate-400">
                       {table === 'companies' && r.sector}
                       {table === 'councils' && r.council_type?.replace('_', ' ')}
                       {table === 'regulators' && r.abbreviation}
                     </td>
-                    <td className="px-4 py-2 text-gray-500 dark:text-gray-400 truncate max-w-48">{r.complaint_email || '\u2014'}</td>
+                    <td className="px-4 py-2 text-slate-400 dark:text-slate-400 truncate max-w-48">{r.complaint_email || '\u2014'}</td>
                     <td className="px-4 py-2 text-right">
-                      <button onClick={() => startEdit(r)} className="text-blue-600 hover:text-blue-700 text-xs font-medium mr-2">Edit</button>
+                      <button onClick={() => startEdit(r)} className="text-amber-600 dark:text-amber-400 hover:text-amber-500 text-xs font-medium mr-2">Edit</button>
                       <button onClick={() => deleteRecord(r.id, r.name)} className="text-red-500 hover:text-red-600 text-xs font-medium">Delete</button>
                     </td>
                   </>
@@ -320,17 +320,17 @@ export default function RecipientsAdminPage() {
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="text-sm text-blue-600 hover:text-blue-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+            className="text-sm text-amber-600 dark:text-amber-400 hover:text-amber-500 disabled:text-slate-300 disabled:cursor-not-allowed"
           >
             Previous
           </button>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-slate-400 dark:text-slate-400">
             Page {page} of {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="text-sm text-blue-600 hover:text-blue-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+            className="text-sm text-amber-600 dark:text-amber-400 hover:text-amber-500 disabled:text-slate-300 disabled:cursor-not-allowed"
           >
             Next
           </button>

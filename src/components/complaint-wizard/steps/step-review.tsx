@@ -69,24 +69,24 @@ export function StepReview({ userName, userAddress, onGenerate, isGenerating, ge
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Review your complaint</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <h2 className="font-serif text-2xl text-slate-900 dark:text-white mb-1">Review your complaint</h2>
+        <p className="text-sm text-slate-400 dark:text-slate-400">
           Check everything looks right before generating your complaint letter.
         </p>
       </div>
 
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 overflow-hidden">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
         {sections.map((s) => (
-          <div key={s.step} className="flex items-start justify-between p-4 bg-white dark:bg-gray-900">
+          <div key={s.step} className="flex items-start justify-between p-4 bg-white dark:bg-slate-900/60">
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+              <p className="text-xs font-medium text-slate-400 dark:text-slate-400 uppercase tracking-wide mb-1">
                 {s.title}
               </p>
-              <p className="text-sm text-gray-900 dark:text-gray-100">{s.content}</p>
+              <p className="text-sm text-slate-900 dark:text-white">{s.content}</p>
             </div>
             <button
               onClick={() => setStep(s.step)}
-              className="ml-4 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 shrink-0"
+              className="ml-4 text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 shrink-0"
             >
               Edit
             </button>
@@ -95,32 +95,32 @@ export function StepReview({ userName, userAddress, onGenerate, isGenerating, ge
       </div>
 
       {/* User profile info */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
-        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-stone-50 dark:bg-slate-900/50 p-4">
+        <p className="text-xs font-medium text-slate-400 dark:text-slate-400 uppercase tracking-wide mb-2">
           Your details
         </p>
         {userName ? (
           <p className="text-sm">{userName}</p>
         ) : (
-          <p className="text-sm text-gray-400 italic">Name not set</p>
+          <p className="text-sm text-slate-300 italic">Name not set</p>
         )}
         {userAddress ? (
-          <p className="text-sm text-gray-600 dark:text-gray-400">{userAddress}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{userAddress}</p>
         ) : (
-          <p className="text-sm text-gray-400 italic">Address not set</p>
+          <p className="text-sm text-slate-300 italic">Address not set</p>
         )}
         <a
           href="/profile"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block mt-2 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700"
+          className="inline-block mt-2 text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-500"
         >
           Update profile &rarr;
         </a>
       </div>
 
       {generateError && (
-        <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-3">
+        <div className="rounded-xl bg-red-50 dark:bg-red-900/20 p-3">
           <p className="text-sm text-red-600 dark:text-red-400">{generateError}</p>
         </div>
       )}
@@ -130,7 +130,7 @@ export function StepReview({ userName, userAddress, onGenerate, isGenerating, ge
         <button
           onClick={onGenerate}
           disabled={isGenerating}
-          className="w-full bg-blue-600 text-white rounded-md px-4 py-3 text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="w-full bg-slate-900 dark:bg-amber-500 text-white rounded-xl px-4 py-3 text-sm font-semibold hover:bg-slate-700 dark:hover:bg-amber-400 disabled:opacity-50 transition-colors"
         >
           {isGenerating ? (
             <span className="flex items-center justify-center gap-2">
@@ -145,7 +145,7 @@ export function StepReview({ userName, userAddress, onGenerate, isGenerating, ge
           )}
         </button>
         {isGenerating && (
-          <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-center text-xs text-slate-400 dark:text-slate-400 mt-2">
             This usually takes about 5 seconds
           </p>
         )}

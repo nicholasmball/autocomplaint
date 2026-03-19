@@ -5,10 +5,19 @@ import { useWizard } from '../wizard-context'
 import { RecipientAutocomplete } from '@/components/recipient-autocomplete'
 import type { RecipientType } from '@/services/complaint-generator/types'
 
-const RECIPIENT_TYPES: { value: RecipientType; label: string; icon: string; desc: string }[] = [
-  { value: 'company', label: 'Company', icon: '\u{1F3E2}', desc: 'A business or service provider' },
-  { value: 'mp', label: 'My MP', icon: '\u{1F3DB}\uFE0F', desc: 'Your member of parliament' },
-  { value: 'regulator', label: 'Regulator', icon: '\u2696\uFE0F', desc: 'An ombudsman or regulator' },
+const RECIPIENT_TYPES: { value: RecipientType; label: string; desc: string; icon: React.ReactNode }[] = [
+  {
+    value: 'company', label: 'Company', desc: 'A business or service provider',
+    icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>,
+  },
+  {
+    value: 'mp', label: 'Your MP', desc: 'Your member of parliament',
+    icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+  },
+  {
+    value: 'regulator', label: 'Regulator', desc: 'An ombudsman or regulator',
+    icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>,
+  },
 ]
 
 interface MPInfo {
@@ -24,6 +33,8 @@ export function StepRecipient() {
   const [postcode, setPostcode] = useState(state.mpDetails ? '' : '')
   const [mpLoading, setMpLoading] = useState(false)
   const [mpError, setMpError] = useState('')
+  const [companySector, setCompanySector] = useState<string | null>(null)
+  const [regulatorSector, setRegulatorSector] = useState<string | null>(null)
 
   function selectType(type: RecipientType) {
     if (type === state.recipientType) return
@@ -34,6 +45,8 @@ export function StepRecipient() {
       mpDetails: type === 'mp' ? state.mpDetails : null,
     })
     setMpError('')
+    setCompanySector(null)
+    setRegulatorSector(null)
   }
 
   async function lookupMP() {
@@ -79,15 +92,14 @@ export function StepRecipient() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Who are you complaining about?</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Select who should receive your complaint.
-        </p>
+        <h2 className="font-serif text-2xl text-slate-900 dark:text-white mb-2">Who are you complaining to?</h2>
+        <p className="text-slate-400 text-lg">Search for a company, council, or your local MP.</p>
       </div>
 
-      <div role="radiogroup" aria-label="Recipient type" className="grid grid-cols-3 gap-3">
+      {/* Recipient type selector — compact tabs */}
+      <div role="radiogroup" aria-label="Recipient type" className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {RECIPIENT_TYPES.map((rt) => {
           const selected = state.recipientType === rt.value
           return (
@@ -96,22 +108,16 @@ export function StepRecipient() {
               role="radio"
               aria-checked={selected}
               onClick={() => selectType(rt.value)}
-              className={`relative flex flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+              className={`px-4 py-3.5 text-sm font-medium rounded-xl transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 ${
                 selected
-                  ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/30'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-900'
+                  ? 'bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 shadow-md'
+                  : 'bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
               }`}
             >
-              <span className="text-2xl" aria-hidden="true">{rt.icon}</span>
-              <span className="text-sm font-semibold">{rt.label}</span>
-              <span className="hidden sm:block text-xs text-gray-500 dark:text-gray-400">{rt.desc}</span>
-              {selected && (
-                <div className="absolute top-2 right-2">
-                  <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              )}
+              <div className="flex items-center gap-2 justify-center">
+                {rt.icon}
+                {rt.label}
+              </div>
             </button>
           )
         })}
@@ -119,44 +125,79 @@ export function StepRecipient() {
 
       {/* Conditional fields */}
       {state.recipientType === 'company' && (
-        <div className="space-y-4 motion-safe:animate-[fadeSlideIn_200ms_ease-out]">
-          <div>
-            <label htmlFor="company-name" className="block text-sm font-medium mb-1">
-              Company name
-            </label>
+        <div className="space-y-5 motion-safe:animate-[fadeSlideIn_200ms_ease-out]">
+          {/* Search — hidden when a company is confirmed */}
+          {!companySector && (
             <RecipientAutocomplete
               id="company-name"
               type="company"
               value={state.recipientName}
               onChange={(name) => update({ recipientName: name })}
-              onSelect={(result) => update({
-                recipientName: result.name,
-                recipientEmail: result.complaint_email || state.recipientEmail,
-              })}
-              placeholder="e.g., British Gas, Sky, BT"
+              onSelect={(result) => {
+                update({
+                  recipientName: result.name,
+                  recipientEmail: result.complaint_email || state.recipientEmail,
+                })
+                setCompanySector(result.sector || '')
+              }}
+              placeholder="Start typing a company name..."
             />
-          </div>
-          <div>
-            <label htmlFor="company-email" className="block text-sm font-medium mb-1">
-              Complaint email address{' '}
-              <span className="font-normal text-gray-400 dark:text-gray-500">(optional — you can add this later)</span>
-            </label>
-            <input
-              id="company-email"
-              type="email"
-              value={state.recipientEmail}
-              onChange={(e) => update({ recipientEmail: e.target.value })}
-              placeholder="e.g., complaints@britishgas.co.uk"
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-            />
-          </div>
+          )}
+
+          {/* Selected recipient card */}
+          {companySector && state.recipientName && (
+            <div className="bg-white dark:bg-slate-900/50 rounded-2xl border border-amber-200 dark:border-amber-800/50 p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span className="text-base font-bold text-amber-600 dark:text-amber-400">
+                      {state.recipientName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white">{state.recipientName}</p>
+                    <p className="text-sm text-slate-400">
+                      {state.recipientEmail && <>{state.recipientEmail} &middot; </>}{companySector}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setCompanySector(null)
+                    update({ recipientName: '', recipientEmail: '' })
+                  }}
+                  className="text-sm text-slate-400 hover:text-red-500 transition-colors"
+                >
+                  Change
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Manual email — shown when no autocomplete match or user typed manually */}
+          {!companySector && (
+            <div>
+              <label htmlFor="company-email" className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
+                Complaint email address{' '}
+                <span className="font-normal text-slate-400">(optional — you can add this later)</span>
+              </label>
+              <input
+                id="company-email"
+                type="email"
+                value={state.recipientEmail}
+                onChange={(e) => update({ recipientEmail: e.target.value })}
+                placeholder="e.g., complaints@britishgas.co.uk"
+                className="w-full px-4 py-3.5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all shadow-sm"
+              />
+            </div>
+          )}
         </div>
       )}
 
       {state.recipientType === 'mp' && (
-        <div className="space-y-4 motion-safe:animate-[fadeSlideIn_200ms_ease-out]">
+        <div className="space-y-5 motion-safe:animate-[fadeSlideIn_200ms_ease-out]">
           <div>
-            <label htmlFor="postcode" className="block text-sm font-medium mb-1">
+            <label htmlFor="postcode" className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
               Your postcode
             </label>
             <div className="flex gap-2">
@@ -168,12 +209,12 @@ export function StepRecipient() {
                 onKeyDown={(e) => e.key === 'Enter' && lookupMP()}
                 placeholder="e.g., SW1A 1AA"
                 aria-describedby={mpError ? 'mp-error' : undefined}
-                className="flex-1 border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                className="flex-1 px-4 py-3.5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all shadow-sm"
               />
               <button
                 onClick={lookupMP}
                 disabled={mpLoading || !postcode.trim()}
-                className="bg-blue-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap"
+                className="bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 rounded-xl px-5 py-3.5 text-sm font-medium hover:bg-slate-800 dark:hover:bg-amber-400 disabled:opacity-50 whitespace-nowrap transition-all shadow-md"
               >
                 {mpLoading ? (
                   <span className="flex items-center gap-2">
@@ -194,62 +235,103 @@ export function StepRecipient() {
           </div>
 
           {state.mpDetails && (
-            <div className="flex items-start gap-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
+            <div className="flex items-start gap-4 rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-white dark:bg-slate-900/50 p-5 shadow-sm">
               {state.mpDetails.photoUrl && (
                 <img
                   src={state.mpDetails.photoUrl}
                   alt={`Photo of ${state.mpDetails.name}`}
-                  className="h-16 w-16 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
+                  className="h-16 w-16 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm"
                 />
               )}
-              <div className="min-w-0">
-                <p className="font-semibold text-sm">{state.mpDetails.name}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-slate-900 dark:text-white">{state.mpDetails.name}</p>
+                <p className="text-sm text-slate-400">
                   {state.mpDetails.party} &mdash; {state.mpDetails.constituency}
                 </p>
                 {state.mpDetails.email && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                  <p className="text-sm text-slate-400 mt-1 truncate">
                     {state.mpDetails.email}
                   </p>
                 )}
               </div>
+              <button
+                onClick={() => {
+                  update({ mpDetails: null, recipientName: '', recipientEmail: '' })
+                  setPostcode('')
+                }}
+                className="text-sm text-slate-400 hover:text-red-500 transition-colors"
+              >
+                Change
+              </button>
             </div>
           )}
         </div>
       )}
 
       {state.recipientType === 'regulator' && (
-        <div className="space-y-4 motion-safe:animate-[fadeSlideIn_200ms_ease-out]">
-          <div>
-            <label htmlFor="regulator-name" className="block text-sm font-medium mb-1">
-              Regulator or ombudsman name
-            </label>
+        <div className="space-y-5 motion-safe:animate-[fadeSlideIn_200ms_ease-out]">
+          {!regulatorSector && (
             <RecipientAutocomplete
               id="regulator-name"
               type="regulator"
               value={state.recipientName}
               onChange={(name) => update({ recipientName: name })}
-              onSelect={(result) => update({
-                recipientName: result.name,
-                recipientEmail: result.complaint_email || state.recipientEmail,
-              })}
+              onSelect={(result) => {
+                update({
+                  recipientName: result.name,
+                  recipientEmail: result.complaint_email || state.recipientEmail,
+                })
+                setRegulatorSector(result.sector || '')
+              }}
               placeholder="e.g., Ofcom, Financial Ombudsman Service"
             />
-          </div>
-          <div>
-            <label htmlFor="regulator-email" className="block text-sm font-medium mb-1">
-              Complaint email address{' '}
-              <span className="font-normal text-gray-400 dark:text-gray-500">(optional — you can add this later)</span>
-            </label>
-            <input
-              id="regulator-email"
-              type="email"
-              value={state.recipientEmail}
-              onChange={(e) => update({ recipientEmail: e.target.value })}
-              placeholder="e.g., complaints@ofcom.org.uk"
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-            />
-          </div>
+          )}
+
+          {regulatorSector && state.recipientName && (
+            <div className="bg-white dark:bg-slate-900/50 rounded-2xl border border-amber-200 dark:border-amber-800/50 p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span className="text-base font-bold text-amber-600 dark:text-amber-400">
+                      {state.recipientName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white">{state.recipientName}</p>
+                    <p className="text-sm text-slate-400">
+                      {state.recipientEmail && <>{state.recipientEmail} &middot; </>}{regulatorSector}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setRegulatorSector(null)
+                    update({ recipientName: '', recipientEmail: '' })
+                  }}
+                  className="text-sm text-slate-400 hover:text-red-500 transition-colors"
+                >
+                  Change
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!regulatorSector && (
+            <div>
+              <label htmlFor="regulator-email" className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
+                Complaint email address{' '}
+                <span className="font-normal text-slate-400">(optional — you can add this later)</span>
+              </label>
+              <input
+                id="regulator-email"
+                type="email"
+                value={state.recipientEmail}
+                onChange={(e) => update({ recipientEmail: e.target.value })}
+                placeholder="e.g., complaints@ofcom.org.uk"
+                className="w-full px-4 py-3.5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all shadow-sm"
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

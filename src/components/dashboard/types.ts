@@ -36,18 +36,19 @@ export const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export const STATUS_STYLES: Record<string, string> = {
-  'draft': 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-  'generated': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  'reviewed': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  'delivered': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  'draft': 'bg-amber-500/10 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
+  'generated': 'bg-slate-900/5 text-slate-600 dark:bg-white/10 dark:text-slate-300',
+  'reviewed': 'bg-slate-900/5 text-slate-600 dark:bg-white/10 dark:text-slate-300',
+  'delivered': 'bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+  'sent': 'bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
 }
 
 export const RESPONSE_STATUS_BADGES: Record<string, { label: string; style: string }> = {
-  'awaiting': { label: 'awaiting', style: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400' },
-  'responded': { label: 'responded', style: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
-  'no_response': { label: 'no response', style: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' },
-  'escalated': { label: 'escalated', style: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' },
-  'resolved': { label: 'resolved', style: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+  'awaiting': { label: 'awaiting', style: 'bg-slate-900/5 text-slate-600 dark:bg-white/10 dark:text-slate-300' },
+  'responded': { label: 'responded', style: 'bg-slate-900/5 text-slate-600 dark:bg-white/10 dark:text-slate-300' },
+  'no_response': { label: 'no response', style: 'bg-amber-500/10 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' },
+  'escalated': { label: 'escalated', style: 'bg-red-500/10 text-red-700 dark:bg-red-500/10 dark:text-red-400' },
+  'resolved': { label: 'resolved', style: 'bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' },
 }
 
 export const CATEGORIES = Object.keys(CATEGORY_LABELS)

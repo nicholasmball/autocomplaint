@@ -121,6 +121,7 @@ export function RecipientAutocomplete({
   return (
     <div ref={wrapperRef} className="relative">
       <div className="relative">
+        <svg className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
         <input
           id={id}
           type="text"
@@ -135,11 +136,11 @@ export function RecipientAutocomplete({
           aria-activedescendant={activeIndex >= 0 ? `${listboxId}-${activeIndex}` : undefined}
           aria-autocomplete="list"
           autoComplete="off"
-          className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+          className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white text-lg placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all shadow-sm"
         />
         {loading && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            <svg className="animate-spin h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
@@ -152,7 +153,7 @@ export function RecipientAutocomplete({
           ref={listRef}
           id={listboxId}
           role="listbox"
-          className="absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg"
+          className="absolute z-50 mt-2 w-full max-h-72 overflow-auto rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 shadow-lg divide-y divide-slate-100 dark:divide-slate-800"
         >
           {results.map((r, i) => (
             <li
@@ -162,26 +163,32 @@ export function RecipientAutocomplete({
               aria-selected={i === activeIndex}
               onMouseDown={() => handleSelect(r)}
               onMouseEnter={() => setActiveIndex(i)}
-              className={`cursor-pointer px-3 py-2 text-sm ${
+              className={`cursor-pointer px-5 py-4 flex items-center gap-4 transition-colors group ${
                 i === activeIndex
-                  ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100'
-                  : 'text-gray-900 dark:text-gray-100'
+                  ? 'bg-amber-500/5 dark:bg-amber-500/10'
+                  : 'hover:bg-amber-500/5 dark:hover:bg-amber-500/10'
               }`}
             >
-              <div className="font-medium">{r.name}</div>
-              {subtitle(r) && (
-                <div className="text-xs text-gray-500 dark:text-gray-400">{subtitle(r)}</div>
-              )}
-              {r.complaint_email && (
-                <div className="text-xs text-gray-400 dark:text-gray-500">{r.complaint_email}</div>
-              )}
+              <div className="w-10 h-10 bg-slate-900/5 dark:bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-300">
+                  {r.abbreviation || r.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{r.name}</div>
+                <div className="text-sm text-slate-400">
+                  {subtitle(r)}
+                  {r.complaint_email && <> &middot; {r.complaint_email}</>}
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-slate-300 dark:text-slate-600 group-hover:text-amber-500 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </li>
           ))}
         </ul>
       )}
 
       {isOpen && results.length === 0 && value.length >= 2 && !loading && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 shadow-lg px-5 py-4 text-sm text-slate-400">
           No matches found — enter details manually
         </div>
       )}

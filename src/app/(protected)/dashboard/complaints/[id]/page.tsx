@@ -61,7 +61,7 @@ export default async function ComplaintDetailPage({
     <div>
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 mb-4"
+        className="inline-flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 mb-4"
         aria-label="Back to complaint history"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -73,8 +73,8 @@ export default async function ComplaintDetailPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-xl font-bold">Complaint to {complaint.recipient_name}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <h1 className="font-serif text-xl">Complaint to {complaint.recipient_name}</h1>
+          <p className="text-sm text-slate-400 dark:text-slate-400">
             {CATEGORY_LABELS[complaint.category] || complaint.category}
             {' \u00B7 '}
             {TONE_LABELS[complaint.tone] || complaint.tone} tone
@@ -87,8 +87,8 @@ export default async function ComplaintDetailPage({
             complaint.status === 'delivered'
               ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
               : complaint.status === 'generated'
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                : 'bg-slate-100 text-slate-500 dark:bg-slate-900/50 dark:text-slate-400'
           }`}
         >
           {complaint.status}
@@ -97,8 +97,8 @@ export default async function ComplaintDetailPage({
       </div>
 
       {/* Status timeline */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 mb-6">
-        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">Status</p>
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 p-4 mb-6">
+        <p className="text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wide mb-3">Status</p>
         <div className="flex items-center">
           {STATUSES.map((status, i) => {
             // Per Design Review note: skip "reviewed" in timeline if complaint didn't go through it
@@ -113,16 +113,16 @@ export default async function ComplaintDetailPage({
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                       isDone
                         ? 'bg-green-600 text-white'
-                        : 'bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-400'
+                        : 'bg-white dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 text-slate-300'
                     }`}
                     aria-label={`${status}: ${isDone ? 'completed' : 'pending'}`}
                   >
                     {isDone ? '\u2713' : i + 1}
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 capitalize hidden sm:block">{status}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-400 mt-1 capitalize hidden sm:block">{status}</span>
                 </div>
                 {i < STATUSES.length - 1 && !(status === 'reviewed' && complaint.status !== 'reviewed' && currentStep !== 2) && (
-                  <div className={`h-0.5 flex-1 ${isDone && i < currentStep ? 'bg-green-600' : 'bg-gray-200 dark:bg-gray-700'}`} />
+                  <div className={`h-0.5 flex-1 ${isDone && i < currentStep ? 'bg-green-600' : 'bg-slate-200 dark:bg-slate-700'}`} />
                 )}
               </div>
             )
@@ -132,7 +132,7 @@ export default async function ComplaintDetailPage({
 
       {/* Not-yet-delivered banner */}
       {complaint.status !== 'delivered' && complaint.generated_letter && (
-        <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 mb-6">
+        <div className="rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 mb-6">
           <p className="text-sm text-amber-800 dark:text-amber-300">
             This complaint hasn&apos;t been sent yet &mdash; deliver it using the actions below.
           </p>
@@ -141,22 +141,22 @@ export default async function ComplaintDetailPage({
 
       {/* Letter */}
       {complaint.generated_letter ? (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden mb-6">
-          <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 overflow-hidden mb-6">
+          <div className="bg-slate-50 dark:bg-white/5 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
             <p className="text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Subject: </span>
+              <span className="text-slate-400 dark:text-slate-400">Subject: </span>
               <span className="font-medium">{complaint.generated_subject}</span>
             </p>
           </div>
           <div className="p-4 sm:p-6">
-            <div className="font-serif text-sm leading-relaxed whitespace-pre-wrap text-gray-800 dark:text-gray-200">
+            <div className="font-serif text-sm leading-relaxed whitespace-pre-wrap text-slate-800 dark:text-slate-200">
               {complaint.generated_letter}
             </div>
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-center py-8 px-6 mb-6">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Letter not yet generated.</p>
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 text-center py-8 px-6 mb-6">
+          <p className="text-sm text-slate-400 dark:text-slate-400">Letter not yet generated.</p>
         </div>
       )}
 
@@ -185,13 +185,13 @@ export default async function ComplaintDetailPage({
       )}
 
       {/* Original complaint details */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden mt-6">
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 overflow-hidden mt-6">
+        <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+          <p className="text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wide">
             Original complaint details
           </p>
         </div>
-        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+        <div className="divide-y divide-slate-100 dark:divide-slate-800">
           <DetailRow label="Recipient" value={`${complaint.recipient_name} (${complaint.recipient_type})`} />
           <DetailRow label="Category" value={CATEGORY_LABELS[complaint.category] || complaint.category} />
           <DetailRow label="Description" value={complaint.description} />
@@ -222,8 +222,8 @@ export default async function ComplaintDetailPage({
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col sm:flex-row px-4 py-3">
-      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 sm:w-36 shrink-0">{label}</span>
-      <span className="text-sm text-gray-900 dark:text-gray-100 mt-0.5 sm:mt-0">{value}</span>
+      <span className="text-sm font-medium text-slate-400 dark:text-slate-400 sm:w-36 shrink-0">{label}</span>
+      <span className="text-sm text-slate-900 dark:text-white mt-0.5 sm:mt-0">{value}</span>
     </div>
   )
 }

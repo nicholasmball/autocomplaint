@@ -5,8 +5,8 @@ import { useState } from 'react'
 type ResponseStatus = 'awaiting' | 'responded' | 'no_response' | 'escalated' | 'resolved'
 
 const STATUS_OPTIONS: { value: ResponseStatus; label: string; color: string }[] = [
-  { value: 'awaiting', label: 'Awaiting response', color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' },
-  { value: 'responded', label: 'Responded', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
+  { value: 'awaiting', label: 'Awaiting response', color: 'bg-slate-100 text-slate-600 dark:bg-slate-900/50 dark:text-slate-300' },
+  { value: 'responded', label: 'Responded', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' },
   { value: 'no_response', label: 'No response', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' },
   { value: 'escalated', label: 'Escalated', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' },
   { value: 'resolved', label: 'Resolved', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
@@ -77,9 +77,9 @@ export function ResponseTracker({
   const showFollowUpDate = status === 'no_response' || status === 'escalated'
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 overflow-hidden">
+      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+        <p className="text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wide">
           Response tracking
         </p>
       </div>
@@ -96,8 +96,8 @@ export function ResponseTracker({
                 onClick={() => setStatus(opt.value)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   status === opt.value
-                    ? `${opt.color} ring-2 ring-offset-1 ring-blue-500 dark:ring-offset-gray-900`
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? `${opt.color} ring-2 ring-offset-1 ring-amber-500 dark:ring-offset-slate-950`
+                    : 'bg-slate-50 dark:bg-slate-900/50 text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                 }`}
               >
                 {opt.label}
@@ -118,7 +118,7 @@ export function ResponseTracker({
                   type="date"
                   value={responseDate}
                   onChange={(e) => setResponseDate(e.target.value)}
-                  className="border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
                 />
               </div>
             )}
@@ -140,7 +140,7 @@ export function ResponseTracker({
                         ? 'Any notes about follow-up attempts...'
                         : 'What did they say?'
                   }
-                  className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
                 />
               </div>
             )}
@@ -155,12 +155,12 @@ export function ResponseTracker({
                       role="radio"
                       aria-checked={satisfactory === val}
                       onClick={() => setSatisfactory(val)}
-                      className={`px-4 py-1.5 rounded-md text-sm font-medium border transition-colors ${
+                      className={`px-4 py-1.5 rounded-xl text-sm font-medium border transition-colors ${
                         satisfactory === val
                           ? val
                             ? 'border-green-600 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700'
                             : 'border-red-600 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-300'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-400 hover:border-slate-300'
                       }`}
                     >
                       {val ? 'Yes' : 'No'}
@@ -181,7 +181,7 @@ export function ResponseTracker({
                   value={escalatedTo}
                   onChange={(e) => setEscalatedTo(e.target.value)}
                   placeholder="e.g., Financial Ombudsman, MP, CEO office"
-                  className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
                 />
               </div>
             )}
@@ -196,7 +196,7 @@ export function ResponseTracker({
                   type="date"
                   value={followUpDate}
                   onChange={(e) => setFollowUpDate(e.target.value)}
-                  className="border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
                 />
               </div>
             )}
@@ -207,7 +207,7 @@ export function ResponseTracker({
           <button
             onClick={save}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-md bg-blue-600 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 px-4 py-2 text-sm font-medium hover:bg-slate-800 dark:hover:bg-amber-400 disabled:opacity-50 transition-colors"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>

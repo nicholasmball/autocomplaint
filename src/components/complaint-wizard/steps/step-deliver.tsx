@@ -99,55 +99,55 @@ export function StepDeliver({ onRegenerate, isRegenerating, onDeliver }: StepDel
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Your complaint is ready</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <h2 className="font-serif text-2xl text-slate-900 dark:text-white mb-1">Your complaint is ready</h2>
+        <p className="text-sm text-slate-400 dark:text-slate-400">
           Review your letter below, then copy it or open it in your email client.
         </p>
       </div>
 
       {/* Letter preview */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="bg-stone-50 dark:bg-slate-900/50 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
           {isEditing ? (
             <input
               type="text"
               value={editSubject}
               onChange={(e) => setEditSubject(e.target.value)}
-              className="w-full border rounded-md px-2 py-1 text-sm font-medium dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full border rounded-xl px-2 py-1 text-sm font-medium dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
             />
           ) : (
             <p className="text-sm font-medium">
-              <span className="text-gray-500 dark:text-gray-400">Subject: </span>
+              <span className="text-slate-400 dark:text-slate-400">Subject: </span>
               {state.generatedSubject}
             </p>
           )}
         </div>
-        <div className="bg-white dark:bg-gray-900 p-4 sm:p-6">
+        <div className="bg-white dark:bg-slate-900/60 p-4 sm:p-6">
           {isEditing ? (
             <textarea
               value={editLetter}
               onChange={(e) => setEditLetter(e.target.value)}
               rows={16}
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 resize-y font-serif leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 resize-y font-serif leading-relaxed focus:outline-none focus:ring-2 focus:ring-amber-500/40"
             />
           ) : (
-            <div className="font-serif text-sm leading-relaxed whitespace-pre-wrap text-gray-800 dark:text-gray-200">
+            <div className="font-serif text-sm leading-relaxed whitespace-pre-wrap text-slate-900 dark:text-slate-200">
               {state.generatedLetter}
             </div>
           )}
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+        <div className="bg-stone-50 dark:bg-slate-900/50 px-4 py-2 border-t border-slate-200 dark:border-slate-700">
           {isEditing ? (
             <div className="flex gap-2">
               <button
                 onClick={saveEdits}
-                className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700"
+                className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-500"
               >
                 Save changes
               </button>
               <button
                 onClick={cancelEdits}
-                className="text-xs font-medium text-gray-500 hover:text-gray-700"
+                className="text-xs font-medium text-slate-400 hover:text-slate-600"
               >
                 Cancel
               </button>
@@ -155,7 +155,7 @@ export function StepDeliver({ onRegenerate, isRegenerating, onDeliver }: StepDel
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700"
+              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-500"
             >
               Edit letter
             </button>
@@ -168,7 +168,7 @@ export function StepDeliver({ onRegenerate, isRegenerating, onDeliver }: StepDel
         <p className="text-sm font-medium">Deliver your complaint</p>
 
         <div>
-          <label htmlFor="recipient-email" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label htmlFor="recipient-email" className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
             Recipient email
           </label>
           <input
@@ -177,14 +177,14 @@ export function StepDeliver({ onRegenerate, isRegenerating, onDeliver }: StepDel
             value={state.recipientEmail}
             onChange={(e) => update({ recipientEmail: e.target.value })}
             placeholder="Enter the recipient's email address"
-            className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+            className="w-full px-4 py-3.5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all shadow-sm"
           />
         </div>
 
         {isLongComplaint && (
           <div
             role="alert"
-            className="flex gap-3 items-start rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 text-sm text-amber-700 dark:text-amber-400"
+            className="flex gap-3 items-start rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 text-sm text-amber-700 dark:text-amber-400"
           >
             <svg className="h-5 w-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -199,10 +199,10 @@ export function StepDeliver({ onRegenerate, isRegenerating, onDeliver }: StepDel
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <button
             onClick={copyToClipboard}
-            className={`flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
               copied
                 ? 'bg-green-600 text-white'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-slate-900 dark:bg-amber-500 text-white hover:bg-slate-700 dark:hover:bg-amber-400'
             }`}
           >
             {copied ? (
@@ -223,9 +223,8 @@ export function StepDeliver({ onRegenerate, isRegenerating, onDeliver }: StepDel
           </button>
           <button
             onClick={openInEmail}
-            disabled={!state.recipientEmail}
-            title={!state.recipientEmail ? 'Enter a recipient email address above' : isLongComplaint ? 'Warning: letter may be truncated in some email clients' : undefined}
-            className="relative flex items-center justify-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title={isLongComplaint ? 'Warning: letter may be truncated in some email clients' : undefined}
+            className="relative flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -244,17 +243,17 @@ export function StepDeliver({ onRegenerate, isRegenerating, onDeliver }: StepDel
       </div>
 
       {/* Secondary actions */}
-      <div className="flex flex-wrap gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex flex-wrap gap-3 pt-2 border-t border-slate-200 dark:border-slate-700">
         <button
           onClick={handleRegenerate}
           disabled={isRegenerating}
-          className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-50"
+          className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-50"
         >
           {isRegenerating ? 'Regenerating...' : showRegenConfirm ? 'This will replace your letter. Confirm?' : 'Regenerate'}
         </button>
         <button
           onClick={handleNewComplaint}
-          className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+          className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
         >
           {showNewConfirm ? 'Are you sure? This clears everything.' : 'New complaint'}
         </button>

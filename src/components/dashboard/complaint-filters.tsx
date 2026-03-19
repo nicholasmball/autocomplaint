@@ -49,14 +49,19 @@ export function ComplaintFilters() {
 
   const hasActiveFilters = status || category || recipientType
 
+  const selectClass = (active: boolean) =>
+    `text-sm px-3 py-2 rounded-xl border bg-white dark:bg-slate-900/50 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500/40 w-full md:w-auto transition-colors ${
+      active
+        ? 'border-amber-500 text-amber-700 dark:border-amber-500 dark:text-amber-400'
+        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+    }`
+
   const filterControls = (
     <>
       <select
         value={status}
         onChange={(e) => updateParam('status', e.target.value)}
-        className={`text-sm px-2.5 py-1.5 rounded-md border bg-white dark:bg-gray-800 dark:text-gray-200 appearance-none cursor-pointer focus:outline-2 focus:outline-blue-600 focus:-outline-offset-1 w-full md:w-auto ${
-          status ? 'border-blue-500 text-blue-700 dark:border-blue-500 dark:text-blue-400' : 'border-gray-300 dark:border-gray-600 text-gray-700'
-        }`}
+        className={selectClass(!!status)}
         aria-label="Filter by status"
       >
         <option value="">All statuses</option>
@@ -68,9 +73,7 @@ export function ComplaintFilters() {
       <select
         value={category}
         onChange={(e) => updateParam('category', e.target.value)}
-        className={`text-sm px-2.5 py-1.5 rounded-md border bg-white dark:bg-gray-800 dark:text-gray-200 appearance-none cursor-pointer focus:outline-2 focus:outline-blue-600 focus:-outline-offset-1 w-full md:w-auto ${
-          category ? 'border-blue-500 text-blue-700 dark:border-blue-500 dark:text-blue-400' : 'border-gray-300 dark:border-gray-600 text-gray-700'
-        }`}
+        className={selectClass(!!category)}
         aria-label="Filter by category"
       >
         <option value="">All categories</option>
@@ -82,9 +85,7 @@ export function ComplaintFilters() {
       <select
         value={recipientType}
         onChange={(e) => updateParam('recipientType', e.target.value)}
-        className={`text-sm px-2.5 py-1.5 rounded-md border bg-white dark:bg-gray-800 dark:text-gray-200 appearance-none cursor-pointer focus:outline-2 focus:outline-blue-600 focus:-outline-offset-1 w-full md:w-auto ${
-          recipientType ? 'border-blue-500 text-blue-700 dark:border-blue-500 dark:text-blue-400' : 'border-gray-300 dark:border-gray-600 text-gray-700'
-        }`}
+        className={selectClass(!!recipientType)}
         aria-label="Filter by recipient type"
       >
         <option value="">All recipients</option>
@@ -95,16 +96,16 @@ export function ComplaintFilters() {
 
       <button
         onClick={cycleSort}
-        className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-md px-2.5 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 md:ml-auto w-full md:w-auto justify-center md:justify-start"
+        className="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-900 md:ml-auto w-full md:w-auto justify-center md:justify-start transition-colors"
         aria-label={`Sort: ${sortLabels[sort]}`}
       >
-        <span>↕</span> {sortLabels[sort]}
+        <span>&#8597;</span> {sortLabels[sort]}
       </button>
 
       {hasActiveFilters && (
         <button
           onClick={clearAll}
-          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 w-full md:w-auto text-center"
+          className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 w-full md:w-auto text-center transition-colors"
         >
           Clear filters
         </button>
@@ -117,11 +118,11 @@ export function ComplaintFilters() {
       {/* Mobile: toggle button */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="md:hidden flex items-center justify-between w-full text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 mb-2"
+        className="md:hidden flex items-center justify-between w-full text-sm text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 mb-2 transition-colors"
         aria-expanded={mobileOpen}
       >
         <span>Filters &amp; Sort{activeCount > 0 ? ` · ${activeCount} active` : ''}</span>
-        <span className="text-xs">{mobileOpen ? '▲' : '▼'}</span>
+        <span className="text-xs">{mobileOpen ? '\u25B2' : '\u25BC'}</span>
       </button>
 
       {/* Mobile: expandable filters */}

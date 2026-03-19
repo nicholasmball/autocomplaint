@@ -208,7 +208,7 @@ function WizardInner({ userName, userAddress }: ComplaintWizardProps) {
       <div className="flex items-center justify-between mb-6">
         <Link
           href="/dashboard"
-          className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-1"
+          className="text-sm text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -216,7 +216,7 @@ function WizardInner({ userName, userAddress }: ComplaintWizardProps) {
           Dashboard
         </Link>
         <span
-          className={`text-xs text-gray-400 dark:text-gray-500 transition-opacity duration-300 ${
+          className={`text-xs text-slate-400 dark:text-slate-500 transition-opacity duration-300 ${
             showSaved ? 'opacity-100' : 'opacity-0'
           }`}
         >
@@ -232,7 +232,7 @@ function WizardInner({ userName, userAddress }: ComplaintWizardProps) {
       )}
 
       {/* Step content */}
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6 sm:p-8" aria-live="polite">
+      <div className="bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm shadow-slate-900/5 dark:border dark:border-slate-700/50 p-6 sm:p-8" aria-live="polite">
         {step === 1 && <StepRecipient />}
         {step === 2 && <StepCategory />}
         {step === 3 && <StepDetails />}
@@ -260,7 +260,7 @@ function WizardInner({ userName, userAddress }: ComplaintWizardProps) {
 
       {/* Validation error */}
       {validationError && (
-        <div className="mt-3 rounded-md bg-red-50 dark:bg-red-900/20 px-4 py-2">
+        <div className="mt-3 rounded-xl bg-red-50 dark:bg-red-900/20 px-4 py-2">
           <p className="text-sm text-red-600 dark:text-red-400">{validationError}</p>
         </div>
       )}
@@ -272,7 +272,7 @@ function WizardInner({ userName, userAddress }: ComplaintWizardProps) {
             {step > 1 && (
               <button
                 onClick={handleBack}
-                className="flex items-center gap-1 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                className="flex items-center gap-1 text-sm font-medium text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -286,14 +286,14 @@ function WizardInner({ userName, userAddress }: ComplaintWizardProps) {
             {isStep3 && (
               <button
                 onClick={() => setStep(4)}
-                className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                className="text-sm font-medium text-slate-400 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
               >
                 Skip
               </button>
             )}
             <button
               onClick={handleNext}
-              className="bg-blue-600 text-white rounded-md px-5 py-2 text-sm font-medium hover:bg-blue-700 flex items-center gap-1"
+              className="bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 rounded-xl px-6 py-2.5 text-sm font-medium hover:bg-slate-700 dark:hover:bg-amber-400 flex items-center gap-1 transition-all hover:-translate-y-0.5 shadow-md hover:shadow-lg"
             >
               Next
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -309,7 +309,7 @@ function WizardInner({ userName, userAddress }: ComplaintWizardProps) {
         <div className="flex items-center mt-6">
           <button
             onClick={handleBack}
-            className="flex items-center gap-1 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+            className="flex items-center gap-1 text-sm font-medium text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

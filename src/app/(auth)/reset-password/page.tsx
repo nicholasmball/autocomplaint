@@ -42,13 +42,13 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-950 px-4">
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-8">Set new password</h1>
+        <h1 className="font-serif text-2xl text-center mb-8">Set new password</h1>
 
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 rounded-lg shadow p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm shadow-slate-900/5 p-6 space-y-4">
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm p-3 rounded">
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm p-3 rounded-xl">
               {error}
             </div>
           )}
@@ -63,7 +63,7 @@ export default function ResetPasswordPage() {
               required
               minLength={8}
               autoFocus
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+              className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
             />
           </div>
 
@@ -76,14 +76,14 @@ export default function ResetPasswordPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+              className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white rounded-md py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="w-full bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 rounded-xl py-2 text-sm font-medium hover:bg-slate-800 dark:hover:bg-amber-400 disabled:opacity-50"
           >
             {loading ? 'Updating...' : 'Update password'}
           </button>

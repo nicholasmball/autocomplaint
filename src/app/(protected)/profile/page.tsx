@@ -104,19 +104,19 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="animate-pulse space-y-4">
-        <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-48" />
-        <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded" />
+        <div className="h-8 bg-slate-200 dark:bg-slate-900/50 rounded-xl w-48" />
+        <div className="h-64 bg-slate-200 dark:bg-slate-900/50 rounded-xl" />
       </div>
     )
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Profile</h1>
+      <h1 className="font-serif text-2xl mb-6">Profile</h1>
 
       {message && (
         <div
-          className={`mb-4 p-3 rounded text-sm ${
+          className={`mb-4 p-3 rounded-xl text-sm ${
             message.type === 'success'
               ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
               : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'
@@ -126,7 +126,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="bg-white dark:bg-gray-900 rounded-lg shadow p-6 space-y-6">
+      <form onSubmit={handleSave} className="bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm shadow-slate-900/5 p-6 space-y-6">
         <section>
           <h2 className="text-lg font-semibold mb-4">Personal Details</h2>
           <div>
@@ -136,7 +136,7 @@ export default function ProfilePage() {
               type="text"
               value={profile.full_name}
               onChange={(e) => updateField('full_name', e.target.value)}
-              className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+              className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
             />
           </div>
         </section>
@@ -151,7 +151,7 @@ export default function ProfilePage() {
                 type="text"
                 value={profile.address_line_1}
                 onChange={(e) => updateField('address_line_1', e.target.value)}
-                className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
               />
             </div>
             <div>
@@ -161,7 +161,7 @@ export default function ProfilePage() {
                 type="text"
                 value={profile.address_line_2}
                 onChange={(e) => updateField('address_line_2', e.target.value)}
-                className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -172,7 +172,7 @@ export default function ProfilePage() {
                   type="text"
                   value={profile.city}
                   onChange={(e) => updateField('city', e.target.value)}
-                  className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                  className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
                 />
               </div>
               <div>
@@ -182,7 +182,7 @@ export default function ProfilePage() {
                   type="text"
                   value={profile.county}
                   onChange={(e) => updateField('county', e.target.value)}
-                  className="w-full border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                  className="w-full border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
                 />
               </div>
             </div>
@@ -193,7 +193,7 @@ export default function ProfilePage() {
                 type="text"
                 value={profile.postcode}
                 onChange={(e) => updateField('postcode', e.target.value)}
-                className="w-full max-w-[200px] border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+                className="w-full max-w-[200px] border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
               />
             </div>
           </div>
@@ -202,22 +202,22 @@ export default function ProfilePage() {
         <button
           type="submit"
           disabled={saving}
-          className="bg-blue-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+          className="bg-slate-900 dark:bg-amber-500 text-white dark:text-slate-950 rounded-xl px-4 py-2 text-sm font-medium hover:bg-slate-800 dark:hover:bg-amber-400 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save profile'}
         </button>
       </form>
 
-      <div className="mt-8 bg-white dark:bg-gray-900 rounded-lg shadow p-6 border border-red-200 dark:border-red-900">
+      <div className="mt-8 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm shadow-slate-900/5 p-6 border border-red-200 dark:border-red-900">
         <h2 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">Danger zone</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
           Permanently delete your account and all associated data. This action cannot be undone.
         </p>
 
         {!showDeleteConfirm ? (
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="bg-red-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-red-700"
+            className="bg-red-600 text-white rounded-xl px-4 py-2 text-sm font-medium hover:bg-red-700"
           >
             Delete account
           </button>
@@ -228,20 +228,20 @@ export default function ProfilePage() {
               type="text"
               value={deleteText}
               onChange={(e) => setDeleteText(e.target.value)}
-              className="border rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+              className="border rounded-xl px-3 py-2 text-sm dark:bg-slate-900/50 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
               autoFocus
             />
             <div className="flex gap-2">
               <button
                 onClick={handleDeleteAccount}
                 disabled={deleteText !== 'DELETE' || deleting}
-                className="bg-red-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+                className="bg-red-600 text-white rounded-xl px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:opacity-50"
               >
                 {deleting ? 'Deleting...' : 'Confirm delete'}
               </button>
               <button
                 onClick={() => { setShowDeleteConfirm(false); setDeleteText('') }}
-                className="border rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="border rounded-xl px-4 py-2 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800"
               >
                 Cancel
               </button>

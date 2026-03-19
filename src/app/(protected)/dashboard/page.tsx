@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Complaint } from '@/components/dashboard/types'
 import { SummaryCards } from '@/components/dashboard/summary-cards'
-import { ComplaintFilters } from '@/components/dashboard/complaint-filters'
 import { ComplaintList } from '@/components/dashboard/complaint-list'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { DashboardSkeleton } from '@/components/dashboard/dashboard-skeleton'
@@ -28,11 +27,14 @@ async function DashboardContent() {
   if (error) {
     return (
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Welcome, {displayName}</h1>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8">
+          <div>
+            <h1 className="font-serif text-3xl text-slate-900 dark:text-white mb-1">Welcome, {displayName}</h1>
+            <p className="text-slate-400">Track and manage your complaints</p>
+          </div>
           <Link
             href="/dashboard/new-complaint"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-blue-700"
+            className="mt-4 sm:mt-0 inline-flex items-center gap-2 bg-amber-500 text-slate-950 rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-amber-400 transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-md"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -40,15 +42,15 @@ async function DashboardContent() {
             New Complaint
           </Link>
         </div>
-        <div className="rounded-lg border border-red-200 dark:border-red-800 bg-white dark:bg-gray-900 text-center py-12 px-6">
-          <div className="text-3xl mb-3">⚠</div>
+        <div className="rounded-2xl bg-white dark:bg-slate-900/60 dark:border dark:border-slate-700/50 shadow-sm shadow-slate-900/5 text-center py-12 px-6">
+          <div className="text-3xl mb-3">&#9888;</div>
           <h2 className="text-base font-semibold text-red-800 dark:text-red-400 mb-1">Couldn&apos;t load your complaints</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Something went wrong fetching your data. This is usually temporary.</p>
+          <p className="text-sm text-slate-400 mb-5">Something went wrong fetching your data. This is usually temporary.</p>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800"
+            className="inline-flex items-center gap-1 text-sm font-medium border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
           >
-            ↻ Try again
+            &#8635; Try again
           </Link>
         </div>
       </div>
@@ -59,11 +61,14 @@ async function DashboardContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Welcome, {displayName}</h1>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8">
+        <div>
+          <h1 className="font-serif text-3xl text-slate-900 dark:text-white mb-1">Welcome, {displayName}</h1>
+          <p className="text-slate-400">Track and manage your complaints</p>
+        </div>
         <Link
           href="/dashboard/new-complaint"
-          className="inline-flex items-center gap-2 bg-blue-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-blue-700"
+          className="mt-4 sm:mt-0 inline-flex items-center gap-2 bg-amber-500 text-slate-950 rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-amber-400 transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-md"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -75,8 +80,6 @@ async function DashboardContent() {
       {typedComplaints.length > 0 ? (
         <>
           <SummaryCards complaints={typedComplaints} />
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Your complaints</h2>
-          <ComplaintFilters />
           <ComplaintList complaints={typedComplaints} />
         </>
       ) : (

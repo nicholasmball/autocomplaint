@@ -30,18 +30,15 @@ export function QuickActions({ subject, letter, recipientEmail, compact }: Quick
     setTimeout(() => setCopied(false), 3000)
   }
 
-  function openInEmail(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    const subjectEncoded = encodeURIComponent(subject)
-    const bodyEncoded = encodeURIComponent(letter)
-    window.open(`mailto:${recipientEmail}?subject=${subjectEncoded}&body=${bodyEncoded}`, '_self')
-  }
+  const mailtoHref = recipientEmail
+    ? `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`
+    : undefined
 
   if (compact) {
     return (
       <div className="flex items-center gap-1" aria-live="polite">
         <button
+          type="button"
           onClick={copyToClipboard}
           className={`w-8 h-8 rounded-md border flex items-center justify-center text-sm transition-colors ${
             copied
@@ -60,16 +57,27 @@ export function QuickActions({ subject, letter, recipientEmail, compact }: Quick
             </svg>
           )}
         </button>
-        <button
-          onClick={openInEmail}
-          disabled={!recipientEmail}
-          className="w-8 h-8 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 flex items-center justify-center text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Open in email client"
-        >
-          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        </button>
+        {mailtoHref ? (
+          <a
+            href={mailtoHref}
+            className="w-8 h-8 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 flex items-center justify-center text-sm transition-colors"
+            aria-label="Open in email client"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </a>
+        ) : (
+          <span
+            className="w-8 h-8 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex items-center justify-center text-sm opacity-50 cursor-not-allowed"
+            aria-label="No email address available"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </span>
+        )}
       </div>
     )
   }
@@ -77,6 +85,7 @@ export function QuickActions({ subject, letter, recipientEmail, compact }: Quick
   return (
     <div className="flex gap-2 flex-wrap" aria-live="polite">
       <button
+        type="button"
         onClick={copyToClipboard}
         className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium min-h-[44px] transition-colors ${
           copied
@@ -100,16 +109,27 @@ export function QuickActions({ subject, letter, recipientEmail, compact }: Quick
           </>
         )}
       </button>
-      <button
-        onClick={openInEmail}
-        disabled={!recipientEmail}
-        className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-        Email
-      </button>
+      {mailtoHref ? (
+        <a
+          href={mailtoHref}
+          className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px] transition-colors"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Email
+        </a>
+      ) : (
+        <span
+          className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 min-h-[44px] opacity-50 cursor-not-allowed"
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Email
+        </span>
+      )}
     </div>
   )
 }

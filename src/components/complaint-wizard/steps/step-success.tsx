@@ -36,11 +36,11 @@ export function StepSuccess() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold mb-1">
+        <h2 className="font-serif text-2xl text-slate-900 dark:text-white mb-1">
           {markedSent ? 'Complaint sent!' : 'Complaint ready to send'}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Your complaint to <span className="font-medium text-gray-900 dark:text-gray-100">{state.recipientName}</span> is ready to send.
+        <p className="text-sm text-slate-400 dark:text-slate-400">
+          Your complaint to <span className="font-medium text-slate-900 dark:text-white">{state.recipientName}</span> is ready to send.
           {refCode && (
             <>
               <br />
@@ -50,13 +50,13 @@ export function StepSuccess() {
         </p>
         <div className="mt-3">
           {markedSent ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-600" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/5 dark:bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden="true" />
               Sent
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-gray-800 px-2.5 py-1 text-xs font-medium text-gray-600 dark:text-gray-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-gray-400" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/5 dark:bg-slate-900/50 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
               Drafted
             </span>
           )}
@@ -64,14 +64,14 @@ export function StepSuccess() {
       </div>
 
       {showPrompt && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-stone-50 dark:bg-slate-900/50 p-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
             Did you send this complaint from your email?
           </p>
           <div className="flex gap-2 justify-center">
             <button
               onClick={markAsSent}
-              className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 text-white px-3 py-1.5 text-sm font-medium hover:bg-blue-700"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 dark:bg-amber-500 text-white px-3 py-1.5 text-sm font-medium hover:bg-slate-700 dark:hover:bg-amber-400"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -80,7 +80,7 @@ export function StepSuccess() {
             </button>
             <button
               onClick={() => setPromptDismissed(true)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
             >
               Not yet
             </button>
@@ -91,22 +91,22 @@ export function StepSuccess() {
       <div className="flex gap-3 justify-center flex-wrap">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 bg-blue-600 text-white rounded-md px-4 py-2.5 text-sm font-medium hover:bg-blue-700"
+          className="inline-flex items-center gap-2 bg-slate-900 dark:bg-amber-500 text-white rounded-xl px-4 py-2.5 text-sm font-medium hover:bg-slate-700 dark:hover:bg-amber-400"
         >
           View complaint history
         </Link>
         <button
           onClick={reset}
-          className="inline-flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
         >
           Start new complaint
         </button>
       </div>
 
-      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-        <p className="text-xs text-gray-400 dark:text-gray-500">
+      <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+        <p className="text-xs text-slate-300 dark:text-slate-500">
           You can view and re-send this complaint from your{' '}
-          <Link href="/dashboard" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/dashboard" className="text-amber-600 dark:text-amber-400 hover:underline">
             dashboard
           </Link>
           .
