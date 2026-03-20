@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { validateCompany, type ScrapeResult } from '@/services/contact-scraper'
 
+export const maxDuration = 300 // 5 minutes (Pro plan allows up to 300s)
+
 const BATCH_LIMIT = 5
 const STALE_DAYS = 30
 
