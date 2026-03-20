@@ -11,6 +11,7 @@ interface QuickActionsProps {
 
 export function QuickActions({ subject, letter, recipientEmail, compact }: QuickActionsProps) {
   const [copied, setCopied] = useState(false)
+  const [emailAttempted, setEmailAttempted] = useState(false)
 
   async function copyToClipboard(e: React.MouseEvent) {
     e.preventDefault()
@@ -28,6 +29,21 @@ export function QuickActions({ subject, letter, recipientEmail, compact }: Quick
     }
     setCopied(true)
     setTimeout(() => setCopied(false), 3000)
+  }
+
+  async function silentCopyLetter() {
+    const text = `Subject: ${subject}\n\n${letter}`
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      // Fallback — best effort
+    }
+  }
+
+  function handleEmailClick(e: React.MouseEvent) {
+    e.stopPropagation()
+    silentCopyLetter()
+    setEmailAttempted(true)
   }
 
   const mailtoHref = recipientEmail
@@ -60,9 +76,11 @@ export function QuickActions({ subject, letter, recipientEmail, compact }: Quick
         {mailtoHref ? (
           <a
             href={mailtoHref}
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-8 h-8 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 flex items-center justify-center text-sm transition-colors"
             aria-label="Open in email client"
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleEmailClick}
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -112,8 +130,10 @@ export function QuickActions({ subject, letter, recipientEmail, compact }: Quick
       {mailtoHref ? (
         <a
           href={mailtoHref}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px] transition-colors"
-          onClick={(e) => e.stopPropagation()}
+          onClick={handleEmailClick}
         >
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -129,6 +149,22 @@ export function QuickActions({ subject, letter, recipientEmail, compact }: Quick
           </svg>
           Email
         </span>
+      )}
+      {emailAttempted && recipientEmail && (
+        <p className="w-full text-xs text-gray-500 dark:text-gray-400 mt-1">
+          Letter copied to clipboard. If your email client didn&apos;t open, paste it into a new email to{' '}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              navigator.clipboard.writeText(recipientEmail)
+            }}
+            className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            title="Copy email address"
+          >
+            {recipientEmail}
+          </button>
+        </p>
       )}
     </div>
   )

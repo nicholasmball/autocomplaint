@@ -1,7 +1,7 @@
-import { Complaint, STATUS_STYLES } from './types'
+import { STATUS_STYLES } from './types'
 
 interface SummaryCardsProps {
-  complaints: Complaint[]
+  complaints: { status: string }[]
 }
 
 export function SummaryCards({ complaints }: SummaryCardsProps) {

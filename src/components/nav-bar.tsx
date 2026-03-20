@@ -40,8 +40,8 @@ export function NavBar({ userEmail }: { userEmail: string }) {
             <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-slate-900 dark:text-white bg-slate-900/5 dark:bg-white/10 rounded-lg transition-colors">
               Dashboard
             </Link>
-            <Link href="/dashboard/new-complaint" className="px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/10 rounded-lg transition-colors">
-              New Complaint
+            <Link href="/dashboard/complaints" className="px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/10 rounded-lg transition-colors">
+              Complaints
             </Link>
             <Link href="/dashboard/admin/recipients" className="px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/10 rounded-lg transition-colors">
               Recipients
@@ -100,11 +100,14 @@ export function NavBar({ userEmail }: { userEmail: string }) {
           <Link href="/dashboard" className="block px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-white bg-slate-900/5 dark:bg-white/10 rounded-lg" onClick={() => setMobileOpen(false)}>
             Dashboard
           </Link>
-          <Link href="/dashboard/new-complaint" className="block px-4 py-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/10 rounded-lg" onClick={() => setMobileOpen(false)}>
-            New Complaint
+          <Link href="/dashboard/complaints" className="block px-4 py-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/10 rounded-lg" onClick={() => setMobileOpen(false)}>
+            Complaints
           </Link>
           <Link href="/dashboard/admin/recipients" className="block px-4 py-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/10 rounded-lg" onClick={() => setMobileOpen(false)}>
             Recipients
+          </Link>
+          <Link href="/dashboard/new-complaint" className="block px-4 py-2.5 text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg" onClick={() => setMobileOpen(false)}>
+            + New Complaint
           </Link>
           <Link href="/profile" className="block px-4 py-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/10 rounded-lg" onClick={() => setMobileOpen(false)}>
             Profile
