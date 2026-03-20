@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { validateCompany, type ScrapeResult } from '@/services/contact-scraper'
 
-const BATCH_LIMIT = 20
+const BATCH_LIMIT = 5
 const STALE_DAYS = 30
 
 export async function GET(request: NextRequest) {
