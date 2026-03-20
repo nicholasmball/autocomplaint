@@ -1,14 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/scraper",
-      "schedule": "0 2 * * *"
-    }
-  ],
-  "functions": {
-    "src/app/api/cron/scraper/route.ts": {
-      "maxDuration": 300,
-      "memory": 1024
-    }
-  }
-}
+{}
