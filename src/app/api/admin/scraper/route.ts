@@ -38,6 +38,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No companies found' }, { status: 404 })
   }
 
+  // Create scraper run record (skip for dry runs)
+  let runId: string | null = null
+  if (!dryRun) {
+    const { data: run } = await supabase
+      .from('scraper_runs')
+      .insert({ trigger: 'manual' as const, started_at: new Date().toISOString() })
+      .select('id')
+      .single()
+    runId = run?.id ?? null
+  }
+
   const results: ScrapeResult[] = []
   const summary = { total: companies.length, verified: 0, updated: 0, not_found: 0, errors: 0 }
 
@@ -67,5 +78,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ results, summary, dryRun })
+  // Finalize scraper run record
+  if (!dryRun && runId) {
+    await supabase
+      .from('scraper_runs')
+      .update({
+        completed_at: new Date().toISOString(),
+        total_processed: companies.length,
+        updated_count: summary.updated,
+        error_count: summary.errors,
+        results: JSON.parse(JSON.stringify(results)),
+      })
+      .eq('id', runId)
+  }
+
+  return NextResponse.json({ results, summary, dryRun, runId })
 }

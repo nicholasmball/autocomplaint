@@ -16,6 +16,25 @@ interface Recipient {
   description?: string
 }
 
+interface ScraperRunResult {
+  companyName: string
+  status: 'verified' | 'updated' | 'not_found' | 'error'
+  foundEmail: string | null
+  confidence: 'high' | 'medium' | 'low' | 'none'
+  error?: string
+}
+
+interface ScraperRun {
+  id: string
+  started_at: string
+  completed_at: string | null
+  total_processed: number
+  updated_count: number
+  error_count: number
+  trigger: 'manual' | 'cron'
+  results: ScraperRunResult[]
+}
+
 const TABS: { value: TableName; label: string }[] = [
   { value: 'companies', label: 'Companies' },
   { value: 'councils', label: 'Councils' },
@@ -23,6 +42,57 @@ const TABS: { value: TableName; label: string }[] = [
 ]
 
 const COUNCIL_TYPES = ['county', 'district', 'unitary', 'metropolitan', 'london_borough']
+
+function formatRelativeDate(dateStr: string): string {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 0) return 'today'
+  if (diffDays === 1) return '1 day ago'
+  return `${diffDays} days ago`
+}
+
+function getStalenessColor(dateStr: string | null): string {
+  if (!dateStr) return 'bg-red-400'
+  const diffDays = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24))
+  if (diffDays <= 14) return 'bg-green-400'
+  if (diffDays <= 30) return 'bg-amber-400'
+  return 'bg-red-400'
+}
+
+function getStalenessTextColor(dateStr: string | null): string {
+  if (!dateStr) return 'text-red-500'
+  const diffDays = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24))
+  if (diffDays <= 14) return 'text-slate-400'
+  if (diffDays <= 30) return 'text-amber-500'
+  return 'text-red-500'
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  verified: 'text-blue-600 dark:text-blue-400',
+  updated: 'text-green-600 dark:text-green-400',
+  not_found: 'text-slate-500 dark:text-slate-400',
+  error: 'text-red-500 dark:text-red-400',
+}
+
+const CONFIDENCE_STYLES: Record<string, string> = {
+  high: 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300',
+  medium: 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
+  low: 'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
+  none: 'bg-slate-50 text-slate-400 dark:bg-slate-800 dark:text-slate-500',
+}
 
 export default function RecipientsAdminPage() {
   const [table, setTable] = useState<TableName>('companies')
@@ -36,6 +106,11 @@ export default function RecipientsAdminPage() {
   const [editValues, setEditValues] = useState<Record<string, string>>({})
   const [adding, setAdding] = useState(false)
   const [newRecord, setNewRecord] = useState<Record<string, string>>({})
+
+  // Scraper history state
+  const [scraperRuns, setScraperRuns] = useState<ScraperRun[]>([])
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [expandedRun, setExpandedRun] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -55,7 +130,19 @@ export default function RecipientsAdminPage() {
     }
   }, [table, page, search])
 
+  const fetchScraperRuns = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/scraper-runs')
+      if (!res.ok) return
+      const json = await res.json()
+      setScraperRuns(json.runs)
+    } catch {
+      // silently fail
+    }
+  }, [])
+
   useEffect(() => { fetchData() }, [fetchData])
+  useEffect(() => { fetchScraperRuns() }, [fetchScraperRuns])
 
   function switchTable(t: TableName) {
     setTable(t)
@@ -117,11 +204,19 @@ export default function RecipientsAdminPage() {
     })
   }
 
+  const lastRunDate = scraperRuns.length > 0 ? scraperRuns[0].started_at : null
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-serif text-xl">Recipient Database</h1>
-        <span className="text-sm text-slate-400 dark:text-slate-400">{total} records</span>
+        <div className="flex items-center gap-3">
+          <span className={`inline-flex items-center gap-1.5 text-xs ${getStalenessTextColor(lastRunDate)}`}>
+            <span className={`w-2 h-2 rounded-full ${getStalenessColor(lastRunDate)}`} />
+            {lastRunDate ? `Last scraped ${formatRelativeDate(lastRunDate)}` : 'Never scraped'}
+          </span>
+          <span className="text-sm text-slate-400 dark:text-slate-400">{total} records</span>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -336,6 +431,118 @@ export default function RecipientsAdminPage() {
           </button>
         </div>
       )}
+
+      {/* Scraper History */}
+      <div className="border-t border-slate-200 dark:border-slate-700 mt-6 pt-4">
+        <button
+          onClick={() => setHistoryOpen(!historyOpen)}
+          aria-expanded={historyOpen}
+          className="flex items-center justify-between w-full text-left group"
+        >
+          <div className="flex items-center gap-2">
+            <svg
+              className={`w-4 h-4 text-slate-400 transition-transform ${historyOpen ? 'rotate-90' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <span className="text-sm font-medium text-slate-700 dark:text-white">Scraper History</span>
+            {scraperRuns.length > 0 && (
+              <span className="text-xs text-slate-400">{scraperRuns.length} runs</span>
+            )}
+          </div>
+        </button>
+
+        {historyOpen && (
+          <div className="mt-4 space-y-2">
+            {scraperRuns.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-8 text-center">
+                <p className="text-sm text-slate-400 mb-1">No scraper runs yet</p>
+                <p className="text-xs text-slate-300 dark:text-slate-500">
+                  The scraper runs weekly on Sundays at 02:00 UTC, or manually from the scraper API.
+                </p>
+              </div>
+            ) : (
+              scraperRuns.map((run) => (
+                <div key={run.id} className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                  <button
+                    onClick={() => setExpandedRun(expandedRun === run.id ? null : run.id)}
+                    aria-expanded={expandedRun === run.id}
+                    className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-white/5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        run.trigger === 'cron'
+                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                      }`}>
+                        {run.trigger}
+                      </span>
+                      <span className="text-sm text-slate-700 dark:text-slate-200 font-medium">
+                        {formatDate(run.started_at)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs text-slate-500 dark:text-slate-400">{run.total_processed} processed</span>
+                      <span className="text-xs text-green-600 dark:text-green-400 font-medium">{run.updated_count} updated</span>
+                      {run.error_count > 0 ? (
+                        <span className="text-xs text-red-500 dark:text-red-400">{run.error_count} errors</span>
+                      ) : (
+                        <span className="text-xs text-slate-400 dark:text-slate-500">0 errors</span>
+                      )}
+                      <svg
+                        className={`w-4 h-4 text-slate-300 dark:text-slate-500 transition-transform ${expandedRun === run.id ? 'rotate-90' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {expandedRun === run.id && run.results.length > 0 && (
+                    <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="text-slate-400 dark:text-slate-500">
+                            <th className="text-left py-1 font-medium">Company</th>
+                            <th className="text-left py-1 font-medium">Status</th>
+                            <th className="text-left py-1 font-medium">Email found</th>
+                            <th className="text-left py-1 font-medium">Confidence</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-slate-600 dark:text-slate-300">
+                          {run.results.map((result, i) => (
+                            <tr key={i} className="border-t border-slate-50 dark:border-slate-800">
+                              <td className="py-1.5">{result.companyName}</td>
+                              <td className="py-1.5">
+                                <span className={`font-medium ${STATUS_COLORS[result.status] || ''}`}>
+                                  {result.status}
+                                </span>
+                              </td>
+                              <td className="py-1.5 text-slate-400 dark:text-slate-500">
+                                {result.foundEmail || '\u2014'}
+                              </td>
+                              <td className="py-1.5">
+                                <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${CONFIDENCE_STYLES[result.confidence] || ''}`}>
+                                  {result.confidence}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
