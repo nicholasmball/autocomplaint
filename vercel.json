@@ -6,8 +6,9 @@
     }
   ],
   "functions": {
-    "app/api/cron/**/*": {
-      "maxDuration": 300
+    "src/app/api/cron/scraper/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
     }
   }
 }
