@@ -70,7 +70,7 @@ async function fetchPageWithBrowser(url: string): Promise<string | null> {
   }
 }
 
-async function fetchPage(url: string): Promise<{ content: string | null; jsRendered: boolean }> {
+async function fetchPage(url: string, useJsRendering = true): Promise<{ content: string | null; jsRendered: boolean }> {
   try {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 10000)
@@ -102,21 +102,26 @@ async function fetchPage(url: string): Promise<{ content: string | null; jsRende
       return { content, jsRendered: false }
     }
 
-    // Fallback: try JS rendering
-    const jsContent = await fetchPageWithBrowser(url)
-    if (jsContent) {
-      return { content: jsContent, jsRendered: true }
+    // Fallback: try JS rendering (if enabled)
+    if (useJsRendering) {
+      const jsContent = await fetchPageWithBrowser(url)
+      if (jsContent) {
+        return { content: jsContent, jsRendered: true }
+      }
     }
 
     return { content: content.length > 0 ? content : null, jsRendered: false }
   } catch {
     // Static fetch failed entirely — try browser as last resort
-    const jsContent = await fetchPageWithBrowser(url)
-    return { content: jsContent, jsRendered: !!jsContent }
+    if (useJsRendering) {
+      const jsContent = await fetchPageWithBrowser(url)
+      return { content: jsContent, jsRendered: !!jsContent }
+    }
+    return { content: null, jsRendered: false }
   }
 }
 
-async function findContactPage(companyName: string): Promise<{ content: string; url: string; jsRendered: boolean } | null> {
+async function findContactPage(companyName: string, useJsRendering = true): Promise<{ content: string; url: string; jsRendered: boolean } | null> {
   const slug = companyName
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '')
@@ -130,7 +135,7 @@ async function findContactPage(companyName: string): Promise<{ content: string; 
   for (const domain of domains) {
     for (const path of SEARCH_PATHS) {
       const url = `${domain}${path}`
-      const result = await fetchPage(url)
+      const result = await fetchPage(url, useJsRendering)
       if (result.content && result.content.length > 200) {
         return { content: result.content, url, jsRendered: result.jsRendered }
       }
@@ -177,7 +182,7 @@ export async function validateCompany(company: {
   id: string
   name: string
   complaint_email: string
-}): Promise<ScrapeResult> {
+}, { useJsRendering = true }: { useJsRendering?: boolean } = {}): Promise<ScrapeResult> {
   const result: ScrapeResult = {
     companyId: company.id,
     companyName: company.name,
@@ -190,7 +195,7 @@ export async function validateCompany(company: {
   }
 
   try {
-    const page = await findContactPage(company.name)
+    const page = await findContactPage(company.name, useJsRendering)
 
     if (!page) {
       result.status = 'not_found'

@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
 
   const companyId = body.companyId as string | undefined
   const dryRun = body.dryRun !== false // default true
+  const useJsRendering = body.useJsRendering !== false // default true
 
   // Fetch companies to validate
   let query = supabase.from('companies').select('id, name, complaint_email')
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
   const summary = { total: companies.length, verified: 0, updated: 0, not_found: 0, errors: 0 }
 
   for (const company of companies) {
-    const result = await validateCompany(company)
+    const result = await validateCompany(company, { useJsRendering })
     results.push(result)
 
     // Update DB if not dry run and email was found with a diff
