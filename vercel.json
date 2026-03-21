@@ -1,1 +1,7 @@
-{}
+{
+  "functions": {
+    "src/app/api/admin/scraper/route.ts": {
+      "maxDuration": 300
+    }
+  }
+}

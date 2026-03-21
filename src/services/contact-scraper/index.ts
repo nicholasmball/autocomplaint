@@ -1,4 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 
 export interface ScrapeResult {
   companyId: string
@@ -9,6 +11,7 @@ export interface ScrapeResult {
   confidence: 'high' | 'medium' | 'low' | 'none'
   status: 'verified' | 'updated' | 'not_found' | 'error'
   diff: boolean
+  jsRendered?: boolean
   error?: string
 }
 
@@ -16,7 +19,58 @@ const anthropic = new Anthropic()
 
 const SEARCH_PATHS = ['/complaints', '/contact', '/contact-us', '/help/complaints', '/help/contact']
 
-async function fetchPage(url: string): Promise<string | null> {
+function getLocalChromePath(): string | null {
+  const paths = [
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+  ]
+  // In non-serverless environments, try common paths
+  for (const p of paths) {
+    try {
+      require('fs').accessSync(p)
+      return p
+    } catch { /* not found */ }
+  }
+  return null
+}
+
+async function fetchPageWithBrowser(url: string): Promise<string | null> {
+  let browser = null
+  try {
+    const isServerless = !!process.env.AWS_LAMBDA_FUNCTION_NAME || !!process.env.VERCEL
+
+    const executablePath = isServerless
+      ? await chromium.executablePath()
+      : getLocalChromePath()
+
+    if (!executablePath) return null
+
+    browser = await puppeteer.launch({
+      args: isServerless ? chromium.args : ['--no-sandbox', '--disable-setuid-sandbox'],
+      defaultViewport: { width: 1280, height: 720 },
+      executablePath,
+      headless: true,
+    })
+
+    const page = await browser.newPage()
+    await page.setUserAgent('AutoComplaint Contact Validator/1.0 (complaint email lookup)')
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 15000 })
+
+    const text = await page.evaluate(() => document.body.innerText)
+    const trimmed = text.replace(/\s+/g, ' ').trim().slice(0, 8000)
+
+    return trimmed.length > 50 ? trimmed : null
+  } catch {
+    return null
+  } finally {
+    if (browser) await browser.close().catch(() => {})
+  }
+}
+
+async function fetchPage(url: string): Promise<{ content: string | null; jsRendered: boolean }> {
   try {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 10000)
@@ -31,10 +85,9 @@ async function fetchPage(url: string): Promise<string | null> {
 
     clearTimeout(timeout)
 
-    if (!res.ok) return null
+    if (!res.ok) return { content: null, jsRendered: false }
 
     const html = await res.text()
-    // Strip to text content — remove scripts, styles, and HTML tags
     const stripped = html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
@@ -42,15 +95,28 @@ async function fetchPage(url: string): Promise<string | null> {
       .replace(/\s+/g, ' ')
       .trim()
 
-    // Limit to first 8000 chars to fit in context
-    return stripped.slice(0, 8000)
+    const content = stripped.slice(0, 8000)
+
+    // If static HTML has enough content, use it
+    if (content.length > 200) {
+      return { content, jsRendered: false }
+    }
+
+    // Fallback: try JS rendering
+    const jsContent = await fetchPageWithBrowser(url)
+    if (jsContent) {
+      return { content: jsContent, jsRendered: true }
+    }
+
+    return { content: content.length > 0 ? content : null, jsRendered: false }
   } catch {
-    return null
+    // Static fetch failed entirely — try browser as last resort
+    const jsContent = await fetchPageWithBrowser(url)
+    return { content: jsContent, jsRendered: !!jsContent }
   }
 }
 
-async function findContactPage(companyName: string): Promise<{ content: string; url: string } | null> {
-  // Try common URL patterns based on company name
+async function findContactPage(companyName: string): Promise<{ content: string; url: string; jsRendered: boolean } | null> {
   const slug = companyName
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '')
@@ -64,9 +130,9 @@ async function findContactPage(companyName: string): Promise<{ content: string; 
   for (const domain of domains) {
     for (const path of SEARCH_PATHS) {
       const url = `${domain}${path}`
-      const content = await fetchPage(url)
-      if (content && content.length > 200) {
-        return { content, url }
+      const result = await fetchPage(url)
+      if (result.content && result.content.length > 200) {
+        return { content: result.content, url, jsRendered: result.jsRendered }
       }
       // Rate limit: 1 req/sec
       await new Promise(r => setTimeout(r, 1000))
@@ -132,6 +198,7 @@ export async function validateCompany(company: {
     }
 
     result.sourceUrl = page.url
+    result.jsRendered = page.jsRendered
     const extracted = await extractEmail(company.name, page.content)
     result.foundEmail = extracted.email
     result.confidence = extracted.confidence
