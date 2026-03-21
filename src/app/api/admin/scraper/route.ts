@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { validateCompany, type ScrapeResult } from '@/services/contact-scraper'
+import { validateRecipient, type ScrapeResult, type RecipientTable } from '@/services/contact-scraper'
+
+const VALID_TABLES: RecipientTable[] = ['companies', 'councils', 'regulators']
+
+// Select fields differ by table — councils/regulators have a website column
+function getSelectFields(table: RecipientTable): string {
+  if (table === 'companies') return 'id, name, complaint_email'
+  return 'id, name, complaint_email, website'
+}
 
 // POST /api/admin/scraper — trigger contact validation
 export async function POST(request: NextRequest) {
@@ -18,25 +26,33 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const companyId = body.companyId as string | undefined
+  const table = (body.table as RecipientTable) || 'companies'
+  if (!VALID_TABLES.includes(table)) {
+    return NextResponse.json({ error: 'Invalid table. Must be: companies, councils, or regulators' }, { status: 400 })
+  }
+
+  const recipientId = (body.recipientId || body.companyId) as string | undefined
   const dryRun = body.dryRun !== false // default true
   const useJsRendering = body.useJsRendering !== false // default true
 
-  // Fetch companies to validate
-  let query = supabase.from('companies').select('id, name, complaint_email')
+  // Fetch recipients to validate
+  type Recipient = { id: string; name: string; complaint_email: string; website?: string }
 
-  if (companyId) {
-    query = query.eq('id', companyId)
+  let query = supabase.from(table).select(getSelectFields(table))
+
+  if (recipientId) {
+    query = query.eq('id', recipientId)
   }
 
-  const { data: companies, error } = await query.order('name')
+  const { data, error } = await query.order('name')
+  const recipients = data as Recipient[] | null
 
   if (error) {
-    return NextResponse.json({ error: 'Failed to fetch companies' }, { status: 500 })
+    return NextResponse.json({ error: `Failed to fetch ${table}` }, { status: 500 })
   }
 
-  if (!companies || companies.length === 0) {
-    return NextResponse.json({ error: 'No companies found' }, { status: 404 })
+  if (!recipients || recipients.length === 0) {
+    return NextResponse.json({ error: `No ${table} found` }, { status: 404 })
   }
 
   // Create scraper run record (skip for dry runs)
@@ -44,25 +60,29 @@ export async function POST(request: NextRequest) {
   if (!dryRun) {
     const { data: run } = await supabase
       .from('scraper_runs')
-      .insert({ trigger: 'manual' as const, started_at: new Date().toISOString() })
+      .insert({
+        trigger: 'manual' as const,
+        started_at: new Date().toISOString(),
+        target_table: table,
+      })
       .select('id')
       .single()
     runId = run?.id ?? null
   }
 
   const results: ScrapeResult[] = []
-  const summary = { total: companies.length, verified: 0, updated: 0, not_found: 0, errors: 0 }
+  const summary = { total: recipients.length, verified: 0, updated: 0, not_found: 0, errors: 0 }
 
-  for (const company of companies) {
-    const result = await validateCompany(company, { useJsRendering })
+  for (const recipient of recipients) {
+    const result = await validateRecipient(recipient, { useJsRendering, table })
     results.push(result)
 
     // Update DB if not dry run and email was found with a diff
     if (!dryRun && result.status === 'updated' && result.foundEmail) {
       const { error: updateError } = await supabase
-        .from('companies')
+        .from(table)
         .update({ complaint_email: result.foundEmail })
-        .eq('id', company.id)
+        .eq('id', recipient.id)
 
       if (updateError) {
         result.status = 'error'
@@ -85,7 +105,7 @@ export async function POST(request: NextRequest) {
       .from('scraper_runs')
       .update({
         completed_at: new Date().toISOString(),
-        total_processed: companies.length,
+        total_processed: recipients.length,
         updated_count: summary.updated,
         error_count: summary.errors,
         results: JSON.parse(JSON.stringify(results)),
@@ -93,5 +113,5 @@ export async function POST(request: NextRequest) {
       .eq('id', runId)
   }
 
-  return NextResponse.json({ results, summary, dryRun, runId })
+  return NextResponse.json({ results, summary, table, dryRun, runId })
 }

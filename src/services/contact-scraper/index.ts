@@ -2,6 +2,8 @@ import Anthropic from '@anthropic-ai/sdk'
 import puppeteer from 'puppeteer-core'
 import chromium from '@sparticuz/chromium'
 
+export type RecipientTable = 'companies' | 'councils' | 'regulators'
+
 export interface ScrapeResult {
   companyId: string
   companyName: string
@@ -121,16 +123,54 @@ async function fetchPage(url: string, useJsRendering = true): Promise<{ content:
   }
 }
 
-async function findContactPage(companyName: string, useJsRendering = true): Promise<{ content: string; url: string; jsRendered: boolean } | null> {
-  const slug = companyName
+function getDomainsForTable(slug: string, table: RecipientTable): string[] {
+  switch (table) {
+    case 'councils':
+      return [
+        `https://www.${slug}.gov.uk`,
+        `https://${slug}.gov.uk`,
+        `https://www.${slug}.co.uk`,
+      ]
+    case 'regulators':
+      return [
+        `https://www.${slug}.org.uk`,
+        `https://${slug}.org.uk`,
+        `https://www.${slug}.gov.uk`,
+        `https://www.${slug}.co.uk`,
+      ]
+    default:
+      return [
+        `https://www.${slug}.co.uk`,
+        `https://www.${slug}.com`,
+        `https://${slug}.co.uk`,
+      ]
+  }
+}
+
+async function findContactPage(
+  name: string,
+  { useJsRendering = true, website, table = 'companies' }: { useJsRendering?: boolean; website?: string; table?: RecipientTable } = {}
+): Promise<{ content: string; url: string; jsRendered: boolean } | null> {
+  // If website is provided, use it directly as the base domain
+  if (website) {
+    const base = website.startsWith('http') ? website : `https://${website}`
+    // Try the website root and common contact paths
+    for (const path of ['', ...SEARCH_PATHS]) {
+      const url = path ? `${base.replace(/\/$/, '')}${path}` : base
+      const result = await fetchPage(url, useJsRendering)
+      if (result.content && result.content.length > 200) {
+        return { content: result.content, url, jsRendered: result.jsRendered }
+      }
+      await new Promise(r => setTimeout(r, 1000))
+    }
+  }
+
+  // Fallback: guess domains from name with table-specific patterns
+  const slug = name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '')
 
-  const domains = [
-    `https://www.${slug}.co.uk`,
-    `https://www.${slug}.com`,
-    `https://${slug}.co.uk`,
-  ]
+  const domains = getDomainsForTable(slug, table)
 
   for (const domain of domains) {
     for (const path of SEARCH_PATHS) {
@@ -139,7 +179,6 @@ async function findContactPage(companyName: string, useJsRendering = true): Prom
       if (result.content && result.content.length > 200) {
         return { content: result.content, url, jsRendered: result.jsRendered }
       }
-      // Rate limit: 1 req/sec
       await new Promise(r => setTimeout(r, 1000))
     }
   }
@@ -178,15 +217,16 @@ ${pageContent}`,
   }
 }
 
-export async function validateCompany(company: {
+export async function validateRecipient(recipient: {
   id: string
   name: string
   complaint_email: string
-}, { useJsRendering = true }: { useJsRendering?: boolean } = {}): Promise<ScrapeResult> {
+  website?: string
+}, { useJsRendering = true, table = 'companies' as RecipientTable }: { useJsRendering?: boolean; table?: RecipientTable } = {}): Promise<ScrapeResult> {
   const result: ScrapeResult = {
-    companyId: company.id,
-    companyName: company.name,
-    currentEmail: company.complaint_email,
+    companyId: recipient.id,
+    companyName: recipient.name,
+    currentEmail: recipient.complaint_email,
     foundEmail: null,
     sourceUrl: null,
     confidence: 'none',
@@ -195,7 +235,11 @@ export async function validateCompany(company: {
   }
 
   try {
-    const page = await findContactPage(company.name, useJsRendering)
+    const page = await findContactPage(recipient.name, {
+      useJsRendering,
+      website: recipient.website,
+      table,
+    })
 
     if (!page) {
       result.status = 'not_found'
@@ -204,13 +248,13 @@ export async function validateCompany(company: {
 
     result.sourceUrl = page.url
     result.jsRendered = page.jsRendered
-    const extracted = await extractEmail(company.name, page.content)
+    const extracted = await extractEmail(recipient.name, page.content)
     result.foundEmail = extracted.email
     result.confidence = extracted.confidence
 
     if (!extracted.email) {
       result.status = 'not_found'
-    } else if (extracted.email.toLowerCase() === company.complaint_email.toLowerCase()) {
+    } else if (extracted.email.toLowerCase() === recipient.complaint_email.toLowerCase()) {
       result.status = 'verified'
       result.diff = false
     } else {
@@ -224,3 +268,6 @@ export async function validateCompany(company: {
 
   return result
 }
+
+// Backward compatibility alias
+export const validateCompany = validateRecipient

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design: Extend Scraper to Councils &amp; Regulators</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"DM Serif Display"', 'Georgia', 'serif'],
+            sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 p-8 max-w-4xl mx-auto">
+
+  <h1 class="font-serif text-3xl mb-2">Extend Scraper to Councils &amp; Regulators</h1>
+  <p class="text-gray-500 mb-8">API-only change &mdash; no UI modifications required</p>
+
+  <!-- Section: API Contract -->
+  <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+    <h2 class="text-lg font-semibold mb-4">API Contract Change</h2>
+    <p class="text-sm text-gray-600 mb-4">Building on the Requirements step. The only user-facing change is the API request body.</p>
+
+    <div class="grid grid-cols-2 gap-6">
+      <!-- Before -->
+      <div>
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Before</h3>
+        <pre class="bg-gray-900 text-green-400 text-sm rounded-lg p-4 overflow-x-auto"><code>POST /api/admin/scraper
+{
+  "companyId": "uuid",
+  "dryRun": true,
+  "useJsRendering": true
+}</code></pre>
+      </div>
+      <!-- After -->
+      <div>
+        <h3 class="text-xs font-semibold text-amber-500 uppercase tracking-wider mb-2">After</h3>
+        <pre class="bg-gray-900 text-green-400 text-sm rounded-lg p-4 overflow-x-auto"><code>POST /api/admin/scraper
+{
+  <span class="text-amber-400">"table": "councils",</span>
+  "recipientId": "uuid",
+  "dryRun": true,
+  "useJsRendering": true
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="mt-4 text-sm text-gray-600">
+      <p><strong>table</strong> &mdash; <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">'companies' | 'councils' | 'regulators'</code> (default: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">'companies'</code>)</p>
+      <p class="mt-1"><strong>companyId</strong> renamed to <strong>recipientId</strong> for clarity (companyId still accepted for backward compat)</p>
+    </div>
+  </section>
+
+  <!-- Section: Domain Resolution Flow -->
+  <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+    <h2 class="text-lg font-semibold mb-4">Domain Resolution Logic</h2>
+
+    <div class="space-y-3">
+      <!-- Step 1 -->
+      <div class="flex items-start gap-3">
+        <div class="w-7 h-7 bg-amber-500 text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">1</div>
+        <div>
+          <p class="font-medium">Check <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">website</code> field</p>
+          <p class="text-sm text-gray-500">Councils and regulators have a <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">website</code> column. If populated, use it directly as the base domain.</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="flex items-start gap-3">
+        <div class="w-7 h-7 bg-amber-500 text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">2</div>
+        <div>
+          <p class="font-medium">Fallback: guess domain from name</p>
+          <p class="text-sm text-gray-500">If no website, generate slug from name and try domain patterns based on table type:</p>
+          <div class="mt-2 grid grid-cols-3 gap-2 text-xs">
+            <div class="bg-blue-50 border border-blue-100 rounded-lg p-2">
+              <p class="font-semibold text-blue-700">Companies</p>
+              <p class="text-blue-600 mt-1">{slug}.co.uk<br>{slug}.com</p>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-2">
+              <p class="font-semibold text-emerald-700">Councils</p>
+              <p class="text-emerald-600 mt-1">{slug}.gov.uk<br>{slug}.co.uk</p>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-lg p-2">
+              <p class="font-semibold text-purple-700">Regulators</p>
+              <p class="text-purple-600 mt-1">{slug}.org.uk<br>{slug}.gov.uk<br>{slug}.co.uk</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="flex items-start gap-3">
+        <div class="w-7 h-7 bg-amber-500 text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">3</div>
+        <div>
+          <p class="font-medium">Try contact page paths</p>
+          <p class="text-sm text-gray-500">Same as current: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/complaints</code>, <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/contact</code>, <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/contact-us</code>, <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/help/complaints</code>, <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/help/contact</code></p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="flex items-start gap-3">
+        <div class="w-7 h-7 bg-amber-500 text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">4</div>
+        <div>
+          <p class="font-medium">Extract email with Claude</p>
+          <p class="text-sm text-gray-500">Reuse existing <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">extractEmail()</code> &mdash; no changes needed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Service Interface -->
+  <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+    <h2 class="text-lg font-semibold mb-4">Updated Service Interface</h2>
+    <pre class="bg-gray-900 text-green-400 text-sm rounded-lg p-4 overflow-x-auto"><code>// Renamed from validateCompany
+export async function validateRecipient(
+  recipient: {
+    id: string
+    name: string
+    complaint_email: string
+    <span class="text-amber-400">website?: string  // councils & regulators</span>
+  },
+  options?: {
+    useJsRendering?: boolean  // default: true
+    <span class="text-amber-400">table?: 'companies' | 'councils' | 'regulators'  // for domain patterns</span>
+  }
+): Promise&lt;ScrapeResult&gt;</code></pre>
+    <p class="text-sm text-gray-500 mt-3"><code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">validateCompany</code> kept as a re-export alias for backward compatibility.</p>
+  </section>
+
+  <!-- Section: No UI Changes -->
+  <section class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+    <h2 class="text-lg font-semibold text-amber-800 mb-2">No UI Changes Required</h2>
+    <p class="text-sm text-amber-700">The admin recipients page already has tabs for Companies, Councils, and Regulators. Scraper history display uses the same <code class="bg-amber-100 px-1.5 py-0.5 rounded text-xs">ScrapeResult</code> schema across all tables. No wireframes needed.</p>
+  </section>
+
+</body>
+</html>
